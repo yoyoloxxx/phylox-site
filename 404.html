@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Page not found — Phylox</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#F7F5F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F0E0B" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/assets/site.css">
+<script>
+  (function(){var d=document.documentElement,l=null;
+    try{l=localStorage.getItem("phylox-lang");}catch(e){}
+    if(l!=="en"&&l!=="ru"){l="en";}
+    d.setAttribute("data-lang",l);d.setAttribute("lang",l);
+    if(l==="ru"){document.title="Страница не найдена — Phylox";}})();
+</script>
+<script src="/assets/site.js" defer></script>
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Phylox">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path class="mark-a" d="M15.2 2.46 3.9 9v14l11.3 6.54z"/><path class="mark-b" d="M16.8 2.46 28.1 9v14l-11.3 6.54z"/></svg>
+      <span>Phylox</span>
+    </a>
+    <div class="lang" role="group" aria-label="Language / Язык" style="margin-left:auto">
+      <button type="button" data-set="en" aria-pressed="true">EN</button>
+      <button type="button" data-set="ru" aria-pressed="false">RU</button>
+    </div>
+  </div>
+</header>
+<main class="wrap nf">
+  <p class="code404">404</p>
+  <h1><span lang="en">This page does not exist.</span><span lang="ru">Такой страницы нет.</span></h1>
+  <p lang="en">The address may be mistyped, or the page may have moved. Everything about Phylox is on the main page.</p>
+  <p lang="ru">Возможно, адрес набран с ошибкой или страница переехала. Всё о Phylox — на главной.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="/"><span lang="en">Go to phylox.org</span><span lang="ru">На главную</span></a>
+    <a class="btn btn-ghost" href="/#roadmap"><span lang="en">Roadmap</span><span lang="ru">План</span></a>
+  </div>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p class="foot-meta" lang="en">Phylox is under development. No public network is running, and YLX is not offered or sold.</p>
+    <p class="foot-meta" lang="ru">Phylox в разработке. Публичная сеть не запущена, YLX не предлагается и не продаётся.</p>
+  </div>
+</footer>
+</body>
+</html>
