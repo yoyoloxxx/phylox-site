@@ -3,846 +3,726 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Phylox — YLX</title>
-<meta name="description" content="Phylox — a next-generation Layer-1 network. Built from scratch. Ticker YLX.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
-<style>
-/* ============================================================
-   PHYLOX — деликатный «тяжёлый люкс»: обсидиан + латунь.
-   Осознанно одна тёмная тема (эстетика вахты Стража); всё
-   красится явными токенами, фон задаётся жёстко.
-   ============================================================ */
-:root{
-  --obsidian:#0A0908;      /* тёплый почти-чёрный — грунт */
-  --vault:#100D09;         /* приподнятая поверхность */
-  --vault-2:#16120B;       /* карточки */
-  --hair:#2A2416;          /* латунные волосяные линии */
-  --hair-soft:#1D1810;
-  --brass:#BC9F5C;         /* фирменная латунь */
-  --brass-hi:#E7D29A;      /* блик */
-  --brass-lo:#6E5B30;      /* тень латуни */
-  --bone:#EDE8DC;          /* основной текст */
-  --muted:#9A9080;         /* приглушённый (сдвинут к латуни) */
-  --muted-2:#6C6455;
-  --steel:#8496A8;         /* холодный вторичный, редко */
-  --ok:#7FA06A;            /* «готово» на роадмапе */
-  --maxw:1180px;
-  color-scheme:dark;
-}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;overflow-x:hidden}
-body{
-  margin:0;
-  background:var(--obsidian);
-  color:var(--bone);
-  font-family:"Space Grotesk",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-  font-weight:300;
-  line-height:1.6;
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
-img{max-width:100%;display:block}
-[hidden]{display:none!important}
-a{color:inherit}
-::selection{background:rgba(188,159,92,.28);color:var(--bone)}
-
-/* ---- фоновые слои (закон №2: фон работает как передний) ---- */
-.bg{position:fixed;inset:0;z-index:0;pointer-events:none}
-.bg-grad{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(120% 80% at 78% -10%, rgba(188,159,92,.13), transparent 55%),
-    radial-gradient(90% 70% at 12% 108%, rgba(132,150,168,.06), transparent 60%),
-    linear-gradient(180deg,#0B0A08 0%, #090807 55%, #0C0A07 100%);
-}
-#dust{position:absolute;inset:0}
-.bg-grain{
-  position:absolute;inset:0;opacity:.05;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-}
-.bg-vignette{position:absolute;inset:0;background:radial-gradient(130% 100% at 50% 40%, transparent 58%, rgba(0,0,0,.55) 100%)}
-
-/* ---- каркас ---- */
-.wrap{position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;padding-inline:clamp(20px,5vw,64px)}
-section{position:relative;z-index:1}
-.eyebrow{
-  font-family:"JetBrains Mono",monospace;font-weight:400;font-size:11px;
-  letter-spacing:.34em;text-transform:uppercase;color:var(--brass);
-  display:inline-flex;align-items:center;gap:.7em;
-}
-.eyebrow::before{content:"";width:26px;height:1px;background:linear-gradient(90deg,var(--brass),transparent)}
-h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;text-wrap:balance;margin:0}
-p{margin:0}
-
-/* ---- навигация ---- */
-header.nav{
-  position:fixed;top:0;left:0;right:0;z-index:40;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px clamp(20px,5vw,64px);
-  transition:background .4s ease, border-color .4s ease, backdrop-filter .4s ease;
-  border-bottom:1px solid transparent;
-}
-header.nav.scrolled{
-  background:rgba(10,9,8,.72);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--hair-soft);
-}
-.brandmark{display:flex;align-items:center;gap:12px;text-decoration:none}
-.sigil{width:26px;height:26px;flex:none}
-.sigil path,.sigil line,.sigil polyline{stroke:var(--brass);stroke-width:1.4;fill:none;vector-effect:non-scaling-stroke}
-.brandmark .name{font-family:"Cormorant Garamond",serif;font-size:23px;font-weight:600;letter-spacing:.03em;color:var(--bone)}
-.nav-right{display:flex;align-items:center;gap:22px}
-.nav-links{display:flex;gap:26px}
-.nav-links a{
-  font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.2em;
-  text-transform:uppercase;color:var(--muted);text-decoration:none;
-  transition:color .25s ease;position:relative;padding:4px 0;
-}
-.nav-links a:hover{color:var(--bone)}
-.lang{
-  display:inline-flex;border:1px solid var(--hair);border-radius:999px;overflow:hidden;
-  font-family:"JetBrains Mono",monospace;font-size:11px;
-}
-.lang button{
-  background:transparent;border:0;color:var(--muted-2);cursor:pointer;
-  padding:6px 11px;letter-spacing:.12em;transition:color .25s,background .25s;
-}
-.lang button[aria-pressed="true"]{background:var(--brass);color:#100D09;font-weight:500}
-.lang button:focus-visible{outline:2px solid var(--brass-hi);outline-offset:2px}
-
-/* ---- HERO ---- */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-block:140px 90px;overflow:hidden}
-.hero-ghost{
-  position:absolute;right:-2vw;top:44%;transform:translateY(-50%);
-  font-family:"Cormorant Garamond",serif;font-weight:600;
-  font-size:clamp(180px,42vw,640px);line-height:.8;color:transparent;
-  -webkit-text-stroke:1px rgba(188,159,92,.10);pointer-events:none;user-select:none;z-index:0;
-}
-.hero-inner{position:relative;z-index:2;max-width:900px}
-.hero h1{
-  font-size:clamp(58px,12vw,168px);line-height:.94;letter-spacing:-.01em;
-  margin:22px 0 0;font-weight:500;
-}
-.hero h1 .ch{display:inline-block;will-change:transform}
-.hero .tag{
-  font-family:"Cormorant Garamond",serif;font-style:italic;font-weight:400;
-  font-size:clamp(22px,3.4vw,40px);color:var(--muted);margin-top:14px;
-}
-.hero .lede{max-width:52ch;margin-top:30px;color:var(--muted);font-size:clamp(15px,1.7vw,18px)}
-.hero .lede b{color:var(--bone);font-weight:500}
-.hero-cta{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:40px}
-.btn{
-  font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
-  text-decoration:none;display:inline-flex;align-items:center;gap:12px;cursor:pointer;
-  border:1px solid var(--brass);color:var(--bone);background:transparent;
-  padding:15px 24px;border-radius:2px;transition:background .3s,color .3s,transform .12s;
-}
-.btn .dot{width:16px;height:16px;border-radius:999px;border:1px solid var(--brass);display:grid;place-items:center;transition:transform .35s cubic-bezier(.23,1,.32,1)}
-.btn .dot::after{content:"→";font-family:sans-serif;font-size:11px;color:var(--brass)}
-.btn:hover{background:var(--brass);color:#0F0C08}
-.btn:hover .dot{transform:translate(3px,-3px);border-color:#0F0C08}
-.btn:hover .dot::after{color:#0F0C08}
-.btn:active{transform:scale(.985)}
-.btn.ghost{border-color:var(--hair)}
-.btn.ghost:hover{background:transparent;color:var(--bone);border-color:var(--brass)}
-.btn:focus-visible{outline:2px solid var(--brass-hi);outline-offset:3px}
-
-/* пульс протокола */
-.pulse{display:flex;align-items:center;gap:14px;margin-top:52px;font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--muted-2);text-transform:uppercase}
-.pulse .ring{position:relative;width:14px;height:14px;flex:none}
-.pulse .ring b{position:absolute;inset:0;margin:auto;width:6px;height:6px;border-radius:999px;background:var(--brass)}
-.pulse .ring i{position:absolute;inset:0;border-radius:999px;border:1px solid var(--brass)}
-.pulse .ring i.beat{animation:beat 4s linear infinite}
-@keyframes beat{0%{transform:scale(.4);opacity:.9}70%{opacity:0}100%{transform:scale(2.4);opacity:0}}
-
-/* ---- общий блок секции ---- */
-.section{padding-block:clamp(90px,13vw,170px)}
-.section-head{max-width:760px}
-.section-head h2{font-size:clamp(34px,5.6vw,68px);line-height:1.02;margin-top:20px}
-.section-head p{color:var(--muted);margin-top:22px;max-width:60ch;font-size:clamp(15px,1.6vw,17px)}
-
-/* ---- манифест (word-scrub) ---- */
-.manifesto{padding-block:clamp(90px,15vw,190px)}
-.manifesto p{
-  font-family:"Cormorant Garamond",serif;font-weight:400;
-  font-size:clamp(28px,4.6vw,60px);line-height:1.2;max-width:20ch;
-}
-.manifesto .w{color:var(--muted-2);transition:color .5s ease}
-.manifesto .w.lit{color:var(--bone)}
-.manifesto .w.br{color:var(--brass)}
-
-/* ---- цифры / гравированная плита ---- */
-.plate{
-  border:1px solid var(--hair);background:
-    linear-gradient(180deg,rgba(188,159,92,.05),transparent 40%),var(--vault);
-  border-radius:4px;overflow:hidden;
-}
-.plate-grid{display:grid;grid-template-columns:repeat(3,1fr)}
-.stat{padding:clamp(24px,3vw,42px);border-right:1px solid var(--hair-soft);border-top:1px solid var(--hair-soft)}
-.stat:nth-child(3n){border-right:0}
-.stat:nth-child(-n+3){border-top:0}
-.stat .k{font-family:"JetBrains Mono",monospace;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted-2)}
-.stat .v{font-family:"Cormorant Garamond",serif;font-size:clamp(38px,5.2vw,60px);font-weight:500;line-height:1;margin-top:16px;font-variant-numeric:tabular-nums}
-.stat .v small{font-size:.42em;color:var(--brass);font-family:"JetBrains Mono",monospace;letter-spacing:.05em;font-weight:400}
-.stat .note{color:var(--muted);font-size:13.5px;margin-top:12px}
-.chainid{cursor:help}
-.chainid .reveal{display:block;color:var(--brass);font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.04em;margin-top:10px;opacity:0;max-height:0;transition:opacity .4s,max-height .4s;font-variant-numeric:normal}
-.chainid.open .reveal{opacity:1;max-height:60px}
-
-/* ---- как это работает (асимметрия, не 3 равных) ---- */
-.mech{display:grid;grid-template-columns:1.15fr 1fr;gap:20px;margin-top:56px}
-.card{
-  position:relative;border:1px solid var(--hair);border-radius:4px;background:var(--vault-2);
-  padding:6px;transition:transform .5s cubic-bezier(.23,1,.32,1),border-color .5s;
-}
-.card:hover{transform:translateY(-6px);border-color:var(--brass-lo)}
-.card .core{border:1px solid var(--hair-soft);border-radius:2px;padding:clamp(22px,2.6vw,34px);height:100%;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.014),transparent)}
-.card canvas.viz{position:absolute;inset:0;width:100%;height:100%;opacity:.9}
-.card .core > *{position:relative;z-index:1}
-.card.wide{grid-column:1 / -1}
-.card .num{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.2em;color:var(--brass-lo)}
-.card h3{font-size:clamp(24px,3vw,34px);margin-top:16px}
-.card p{color:var(--muted);margin-top:12px;max-width:46ch;font-size:14.5px}
-
-/* ---- роадмап ---- */
-.road{position:relative;margin-top:60px;padding-left:34px}
-.road::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:1px;background:linear-gradient(180deg,var(--brass),var(--hair) 30%,var(--hair))}
-.road .draw{position:absolute;left:6px;top:6px;width:1px;background:var(--brass);height:0}
-.stage{position:relative;padding:0 0 44px 6px}
-.stage:last-child{padding-bottom:0}
-.stage .node{position:absolute;left:-34px;top:3px;width:13px;height:13px;border-radius:999px;border:1px solid var(--brass);background:var(--obsidian);display:grid;place-items:center}
-.stage.done .node{background:var(--brass)}
-.stage.now .node b{width:5px;height:5px;border-radius:999px;background:var(--brass);display:block;animation:beat2 2.6s ease-out infinite}
-@keyframes beat2{0%{box-shadow:0 0 0 0 rgba(188,159,92,.5)}100%{box-shadow:0 0 0 10px rgba(188,159,92,0)}}
-.stage .st{font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2)}
-.stage.done .st{color:var(--ok)}
-.stage.now .st{color:var(--brass)}
-.stage h3{font-size:clamp(21px,2.6vw,29px);margin-top:8px}
-.stage p{color:var(--muted);margin-top:8px;max-width:56ch;font-size:14.5px}
-
-/* ---- финал / CTA ---- */
-.finale{text-align:center;padding-block:clamp(100px,16vw,210px)}
-.finale h2{font-size:clamp(40px,8vw,110px);line-height:.98}
-.finale .tag{font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--muted);font-size:clamp(20px,3vw,32px);margin-top:16px}
-.finale .btn{margin-top:44px}
-
-/* ---- footer / colophon ---- */
-footer{border-top:1px solid var(--hair-soft);padding-block:56px;position:relative;z-index:1}
-.foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;align-items:flex-start}
-.colophon{font-family:"JetBrains Mono",monospace;font-size:11.5px;line-height:2;color:var(--muted-2);letter-spacing:.03em}
-.colophon .egg{cursor:pointer;color:var(--muted-2);transition:color .3s}
-.colophon .egg:hover{color:var(--brass)}
-.foot-brand .name{font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:600}
-.foot-brand p{color:var(--muted-2);font-size:13px;margin-top:8px;max-width:34ch}
-.disclaimer{margin-top:34px;color:var(--muted-2);font-size:11.5px;font-family:"JetBrains Mono",monospace;letter-spacing:.02em;max-width:70ch}
-
-/* ---- preloader ---- */
-#pre{position:fixed;inset:0;z-index:100;background:var(--obsidian);display:grid;place-items:center;transition:opacity .8s ease}
-#pre.done{opacity:0;pointer-events:none}
-.pre-in{text-align:center}
-.pre-in svg{width:54px;height:54px;margin:0 auto 22px}
-.pre-in .boot{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.24em;color:var(--brass);text-transform:uppercase}
-.pre-in .bar{width:180px;height:1px;background:var(--hair);margin:18px auto 0;overflow:hidden}
-.pre-in .bar b{display:block;height:100%;width:0;background:var(--brass)}
-
-/* scroll progress */
-#prog{position:fixed;left:0;top:0;height:2px;width:0;background:linear-gradient(90deg,var(--brass-lo),var(--brass-hi));z-index:60}
-
-/* ---- адаптив ---- */
-@media (max-width:820px){
-  .nav-links{display:none}
-  .plate-grid{grid-template-columns:repeat(2,1fr)}
-  .stat:nth-child(3n){border-right:1px solid var(--hair-soft)}
-  .stat:nth-child(2n){border-right:0}
-  .stat:nth-child(-n+3){border-top:1px solid var(--hair-soft)}
-  .stat:nth-child(-n+2){border-top:0}
-  .mech{grid-template-columns:1fr}
-}
-@media (max-width:520px){
-  .plate-grid{grid-template-columns:1fr}
-  .stat{border-right:0!important}
-  .stat:nth-child(n){border-top:1px solid var(--hair-soft)}
-  .stat:first-child{border-top:0}
-  .hero-ghost{opacity:.6}
-}
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
-  .hero h1 .ch{transform:none!important;opacity:1!important}
-}
-</style>
+<title>Phylox — a Layer-1 for transfers with single-block finality</title>
+<meta name="description" content="Phylox is an independent Layer-1 written from scratch in Go: BFT consensus, 4-second blocks, single-block finality, a 0.0001 YLX base fee and half of every fee burned. Pre-launch: running on a test bench, no public network yet.">
+<meta name="theme-color" content="#F7F5F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F0E0B" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+<link rel="canonical" href="https://phylox.org/">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Phylox">
+<meta property="og:url" content="https://phylox.org/">
+<meta property="og:title" content="Phylox — a Layer-1 for transfers with single-block finality">
+<meta property="og:description" content="Independent Layer-1 written from scratch in Go. BFT consensus, 4-second blocks, 0.0001 YLX base fee, half of every fee burned. Pre-launch.">
+<meta property="og:image" content="https://phylox.org/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Phylox — a Layer-1 for transfers, final in one block">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ru_RU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Phylox — a Layer-1 for transfers with single-block finality">
+<meta name="twitter:description" content="Independent Layer-1 written from scratch in Go. BFT consensus, 4-second blocks, 0.0001 YLX base fee. Pre-launch.">
+<meta name="twitter:image" content="https://phylox.org/og-image.png">
+<link rel="preload" href="assets/fonts/plex-sans-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+<script>
+  /* set language before first paint: ?lang= → saved choice → English */
+  (function(){var d=document.documentElement,l=null;
+    try{l=new URLSearchParams(location.search).get("lang");}catch(e){}
+    if(l!=="en"&&l!=="ru"){try{l=localStorage.getItem("phylox-lang");}catch(e){}}
+    if(l!=="en"&&l!=="ru"){l="en";}
+    d.setAttribute("data-lang",l);d.setAttribute("lang",l);d.className+=" js";})();
+</script>
+<script src="assets/site.js" defer></script>
 </head>
 <body>
+<a class="skip" href="#main"><span lang="en">Skip to content</span><span lang="ru">К содержанию</span></a>
 
-<!-- фоновые слои -->
-<div class="bg" aria-hidden="true">
-  <div class="bg-grad"></div>
-  <canvas id="dust"></canvas>
-  <div class="bg-grain"></div>
-  <div class="bg-vignette"></div>
-</div>
-
-<div id="prog" aria-hidden="true"></div>
-
-<!-- preloader -->
-<div id="pre" aria-hidden="true">
-  <div class="pre-in">
-    <svg viewBox="0 0 40 40" class="sigil" aria-hidden="true">
-      <polyline points="20,3 35,11 35,29 20,37 5,29 5,11 20,3"></polyline>
-      <polyline points="20,10 28,14.5 28,25.5 20,30 12,25.5 12,14.5 20,10"></polyline>
-      <line x1="20" y1="10" x2="20" y2="30"></line>
-    </svg>
-    <div class="boot" data-en="Initializing guardian…" data-ru="Инициализация стража…">Initializing guardian…</div>
-    <div class="bar"><b></b></div>
-  </div>
-</div>
-
-<!-- навигация -->
-<header class="nav" id="nav">
-  <a class="brandmark" href="#top" aria-label="Phylox">
-    <svg class="sigil" viewBox="0 0 40 40" aria-hidden="true">
-      <polyline points="20,3 35,11 35,29 20,37 5,29 5,11 20,3"></polyline>
-      <polyline points="20,10 28,14.5 28,25.5 20,30 12,25.5 12,14.5 20,10"></polyline>
-      <line x1="20" y1="10" x2="20" y2="30"></line>
-    </svg>
-    <span class="name">Phylox</span>
-  </a>
-  <div class="nav-right">
-    <nav class="nav-links" aria-label="primary">
-      <a href="#what" data-en="Network" data-ru="Сеть">Network</a>
-      <a href="#specs" data-en="Specs" data-ru="Параметры">Specs</a>
-      <a href="#how" data-en="How it works" data-ru="Как устроено">How it works</a>
-      <a href="#roadmap" data-en="Roadmap" data-ru="Дорога">Roadmap</a>
+<header class="site-header" id="top">
+  <div class="wrap">
+    <a class="brand" href="#main" aria-label="Phylox">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path class="mark-a" d="M15.2 2.46 3.9 9v14l11.3 6.54z"/><path class="mark-b" d="M16.8 2.46 28.1 9v14l-11.3 6.54z"/></svg>
+      <span>Phylox</span>
+    </a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span class="sr-only"><span lang="en">Menu</span><span lang="ru">Меню</span></span>
+    </button>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#protocol"><span lang="en">Protocol</span><span lang="ru">Протокол</span></a>
+      <a href="#design"><span lang="en">How it works</span><span lang="ru">Устройство</span></a>
+      <a href="#verification"><span lang="en">Verification</span><span lang="ru">Проверка</span></a>
+      <a href="#roadmap"><span lang="en">Roadmap</span><span lang="ru">План</span></a>
+      <a href="#developers"><span lang="en">Developers</span><span lang="ru">Разработчикам</span></a>
     </nav>
-    <div class="lang" role="group" aria-label="Language">
+    <div class="lang" role="group" aria-label="Language / Язык">
       <button type="button" data-set="en" aria-pressed="true">EN</button>
       <button type="button" data-set="ru" aria-pressed="false">RU</button>
     </div>
   </div>
 </header>
 
-<main id="top">
+<main id="main">
 
-  <!-- HERO -->
-  <section class="hero wrap">
-    <div class="hero-ghost" aria-hidden="true">YLX</div>
-    <div class="hero-inner">
-      <span class="eyebrow" data-en="Layer-1 · Ticker YLX" data-ru="Layer-1 · Тикер YLX">Layer-1 · Ticker YLX</span>
-      <h1 id="hh1" aria-label="Phylox">Phylox</h1>
-      <p class="tag" data-en="A next-generation network." data-ru="Сеть нового поколения.">A next-generation network.</p>
-      <p class="lede"
-         data-en="A Layer-1 blockchain built from scratch — <b>fast blocks, low fees, deflationary by design.</b> Made for payments people actually use."
-         data-ru="Блокчейн Layer-1, написанный с нуля — <b>быстрые блоки, низкие комиссии, дефляция по устройству.</b> Для платежей, которыми правда пользуются.">
-        A Layer-1 blockchain built from scratch — <b>fast blocks, low fees, deflationary by design.</b> Made for payments people actually use.
-      </p>
-      <div class="hero-cta">
-        <a class="btn" href="#what"><span data-en="Explore the network" data-ru="Смотреть сеть">Explore the network</span><span class="dot"></span></a>
-        <a class="btn ghost" href="#roadmap" data-en="Roadmap" data-ru="Дорожная карта">Roadmap</a>
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <a class="status" href="#roadmap">
+        <span class="dot" aria-hidden="true"></span>
+        <span lang="en">Pre-launch · status as of 15 October 2026</span>
+        <span lang="ru">До запуска · статус на 15 октября 2026</span>
+      </a>
+      <h1>
+        <span lang="en">A Layer-1 for transfers, final in one block.</span>
+        <span lang="ru">Блокчейн для переводов с финальностью в один блок.</span>
+      </h1>
+      <p class="lede" lang="en">Phylox is an independent Layer-1 written from scratch in Go. Tendermint-style BFT consensus produces a block every 4 seconds; once two thirds of the validators sign it, the transfer cannot be reversed. The base fee is 0.0001 YLX, and half of every fee is burned.</p>
+      <p class="lede" lang="ru">Phylox — самостоятельный блокчейн первого уровня, написанный с нуля на Go. BFT-консенсус в духе Tendermint выпускает блок раз в 4 секунды; как только блок подписали две трети валидаторов, перевод уже не откатить. Базовая комиссия — 0,0001 YLX, половина каждой комиссии сжигается.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#design"><span lang="en">How it works</span><span lang="ru">Как устроено</span>
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <a class="btn btn-ghost" href="#verification"><span lang="en">Test results</span><span lang="ru">Результаты проверок</span></a>
       </div>
-      <div class="pulse" aria-hidden="true">
-        <span class="ring"><i></i><i class="beat"></i><b></b></span>
-        <span data-en="Protocol heartbeat — one block every 4 seconds" data-ru="Пульс протокола — блок каждые 4 секунды">Protocol heartbeat — one block every 4 seconds</span>
-      </div>
+      <p class="hero-note" lang="en">Today Phylox runs on a closed test bench of four validators and an observer. There is no public testnet or mainnet yet, and YLX is not sold.</p>
+      <p class="hero-note" lang="ru">Сейчас Phylox работает на закрытом тестовом стенде: четыре валидатора и наблюдатель. Публичной тестовой и основной сети пока нет, YLX не продаётся.</p>
     </div>
-  </section>
 
-  <!-- WHAT -->
-  <section class="section wrap" id="what">
-    <div class="section-head">
-      <span class="eyebrow" data-en="The network" data-ru="Сеть">The network</span>
-      <h2 data-en="A guardian for value in motion." data-ru="Страж для ценности в движении.">A guardian for value in motion.</h2>
-      <p data-en="Phylox — from the Greek phýlax, “guardian” — is an independent Layer-1 chain written line by line in Go, not forked from anyone. The design goal is unglamorous and hard: move value quickly, cheaply and predictably, and never lose a coin along the way."
-         data-ru="Phylox — от греческого phýlax, «страж» — самостоятельная сеть Layer-1, написанная строка за строкой на Go, не форк чужого кода. Цель простая и трудная: перемещать ценность быстро, дёшево и предсказуемо — и не терять ни монеты по дороге.">
-        Phylox — from the Greek phýlax, “guardian” — is an independent Layer-1 chain written line by line in Go, not forked from anyone. The design goal is unglamorous and hard: move value quickly, cheaply and predictably, and never lose a coin along the way.
-      </p>
-    </div>
-  </section>
+    <figure class="round" aria-labelledby="round-cap">
+      <div class="round-head">
+        <span class="round-title"><span lang="en">Height h · round 0</span><span lang="ru">Высота h · раунд 0</span></span>
+        <span class="round-tag"><span lang="en">Schematic</span><span lang="ru">Схема</span></span>
+      </div>
+      <div class="round-grid" id="round" aria-hidden="true">
+        <div class="rg-col"><span lang="en">Validator</span><span lang="ru">Валидатор</span></div>
+        <div class="rg-col"><span lang="en">Proposal</span><span lang="ru">Блок</span></div>
+        <div class="rg-col">Prevote</div>
+        <div class="rg-col">Precommit</div>
 
-  <!-- MANIFESTO -->
-  <section class="manifesto wrap" aria-label="manifesto">
-    <p id="manifesto"
-       data-en="Every coin accounted for. Every block sealed. Nothing lost, nothing invented."
-       data-ru="Каждая монета на счету. Каждый блок опечатан. Ничего не потеряно, ничего не выдумано."></p>
-  </section>
+        <div class="rg-val">V0</div>
+        <div class="cell" data-step="pr" data-v="0"><i></i></div>
+        <div class="cell" data-step="pv" data-v="0"><i></i></div>
+        <div class="cell" data-step="pc" data-v="0"><i></i></div>
 
-  <!-- SPECS -->
-  <section class="section wrap" id="specs">
-    <div class="section-head">
-      <span class="eyebrow" data-en="On the plate" data-ru="На плите">On the plate</span>
-      <h2 data-en="The numbers, engraved." data-ru="Цифры, выгравированы.">The numbers, engraved.</h2>
-      <p data-en="Protocol parameters, not marketing. These are fixed in code and checked by the machine on every build."
-         data-ru="Параметры протокола, а не маркетинг. Они закреплены в коде и сверяются машиной на каждой сборке.">
-        Protocol parameters, not marketing. These are fixed in code and checked by the machine on every build.
-      </p>
-    </div>
-    <div class="plate" role="list">
-      <div class="plate-grid">
-        <div class="stat" role="listitem">
-          <div class="k" data-en="Block time" data-ru="Время блока">Block time</div>
-          <div class="v"><span class="cnt" data-to="4">0</span><small>s</small></div>
-          <div class="note" data-en="A new block every four seconds." data-ru="Новый блок каждые четыре секунды.">A new block every four seconds.</div>
-        </div>
-        <div class="stat" role="listitem">
-          <div class="k" data-en="Initial supply" data-ru="Начальное предложение">Initial supply</div>
-          <div class="v"><span class="cnt" data-to="100">0</span><small>M YLX</small></div>
-          <div class="note" data-en="Fixed genesis supply of 100 million." data-ru="Фиксированный генезис — 100 миллионов.">Fixed genesis supply of 100 million.</div>
-        </div>
-        <div class="stat" role="listitem">
-          <div class="k" data-en="Fee burn" data-ru="Сжигание комиссий">Fee burn</div>
-          <div class="v"><span class="cnt" data-to="50">0</span><small>%</small></div>
-          <div class="note" data-en="Half of every block’s fees burned — deflationary with use." data-ru="Половина комиссий блока сжигается — дефляция от использования.">Half of every block’s fees burned — deflationary with use.</div>
-        </div>
-        <div class="stat chainid" role="listitem" tabindex="0" aria-label="Chain ID 897688">
-          <div class="k" data-en="Chain ID" data-ru="Номер сети">Chain ID</div>
-          <div class="v" style="font-variant-numeric:tabular-nums">897688</div>
-          <div class="note" data-en="Signed into every transaction — replay across chains is impossible." data-ru="Входит в подпись каждой транзакции — повтор в другой сети невозможен.">Signed into every transaction — replay across chains is impossible.</div>
-          <span class="reveal" data-en="Y·L·X in ASCII → 89·76·88. The chain’s own name." data-ru="Y·L·X в ASCII → 89·76·88. Сеть назвала себя сама.">Y·L·X in ASCII → 89·76·88. The chain’s own name.</span>
-        </div>
-        <div class="stat" role="listitem">
-          <div class="k" data-en="Throughput" data-ru="Пропускная">Throughput</div>
-          <div class="v">~<span class="cnt" data-to="1820">0</span></div>
-          <div class="note" data-en="Transfers per block within the 256 KB limit." data-ru="Переводов в блок в пределах лимита 256 КБ.">Transfers per block within the 256 KB limit.</div>
-        </div>
-        <div class="stat" role="listitem">
-          <div class="k" data-en="Precision" data-ru="Точность">Precision</div>
-          <div class="v"><span class="cnt" data-to="9">0</span><small>decimals</small></div>
-          <div class="note" data-en="1 YLX = 1,000,000,000 nano. Integer math only." data-ru="1 YLX = 1 000 000 000 нано. Только целочисленная арифметика.">1 YLX = 1,000,000,000 nano. Integer math only.</div>
-        </div>
-      </div>
-    </div>
-  </section>
+        <div class="rg-val">V1 <small><span lang="en">proposer</span><span lang="ru">сборщик</span></small></div>
+        <div class="cell p" data-step="pr" data-v="1"><i></i></div>
+        <div class="cell" data-step="pv" data-v="1"><i></i></div>
+        <div class="cell" data-step="pc" data-v="1"><i></i></div>
 
-  <!-- HOW -->
-  <section class="section wrap" id="how">
-    <div class="section-head">
-      <span class="eyebrow" data-en="Mechanism" data-ru="Механизм">Mechanism</span>
-      <h2 data-en="Built like a vault, not a demo." data-ru="Собрано как сейф, а не как демо.">Built like a vault, not a demo.</h2>
-      <p data-en="Four decisions carry the whole design. Each one is boring on purpose — boring is what survives real money."
-         data-ru="Четыре решения держат всю конструкцию. Каждое намеренно скучное — скучное и выживает под реальными деньгами.">
-        Four decisions carry the whole design. Each one is boring on purpose — boring is what survives real money.
-      </p>
-    </div>
-    <div class="mech">
-      <div class="card wide">
-        <div class="core">
-          <canvas class="viz" id="vizChain" aria-hidden="true"></canvas>
-          <span class="num">01</span>
-          <h3 data-en="One rhythm: a block every 4 seconds" data-ru="Один ритм: блок каждые 4 секунды">One rhythm: a block every 4 seconds</h3>
-          <p data-en="A steady four-second cadence — fast enough to feel instant at the till, slow enough for nodes across the world to agree before the next block. Finality becomes instant once BFT consensus lands: a sealed block never rolls back."
-             data-ru="Ровный четырёхсекундный такт — достаточно быстрый, чтобы на кассе ощущаться мгновенным, и достаточно медленный, чтобы узлы по всему миру успели согласиться до следующего блока. С приходом BFT финальность станет мгновенной: опечатанный блок не откатывается никогда.">
-            A steady four-second cadence — fast enough to feel instant at the till, slow enough for nodes across the world to agree before the next block. Finality becomes instant once BFT consensus lands: a sealed block never rolls back.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="core">
-          <span class="num">02</span>
-          <h3 data-en="Deflation by use" data-ru="Дефляция от использования">Deflation by use</h3>
-          <p data-en="Half of every block’s fees are burned. The more the network is used, the more supply pressure eases — value flows back to everyone holding, not to a middleman."
-             data-ru="Половина комиссий каждого блока сжигается. Чем активнее сеть, тем слабее давление предложения — ценность возвращается всем держателям, а не посреднику.">
-            Half of every block’s fees are burned. The more the network is used, the more supply pressure eases — value flows back to everyone holding, not to a middleman.
-          </p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="core">
-          <span class="num">03</span>
-          <h3 data-en="Guardians, by a ladder" data-ru="Стражи, по лестнице">Guardians, by a ladder</h3>
-          <p data-en="Consensus starts simple and hardens on a planned ladder: a single trusted validator at launch, then a two-thirds BFT vote, then staking when the coin has a real price. The validator set lives in network state, not in a config file."
-             data-ru="Консенсус стартует простым и крепнет по заранее заданной лестнице: один доверенный валидатор на старте, затем голос BFT в две трети, затем стейкинг, когда у монеты появится реальная цена. Список валидаторов живёт в состоянии сети, а не в конфиге.">
-            Consensus starts simple and hardens on a planned ladder: a single trusted validator at launch, then a two-thirds BFT vote, then staking when the coin has a real price. The validator set lives in network state, not in a config file.
-          </p>
-        </div>
-      </div>
-      <div class="card wide">
-        <div class="core">
-          <canvas class="viz" id="vizTree" aria-hidden="true"></canvas>
-          <span class="num">04</span>
-          <h3 data-en="A balance you can prove" data-ru="Баланс, который можно доказать">A balance you can prove</h3>
-          <p data-en="State lives in a sparse Merkle tree, so any balance can be proven — present or absent — with a handful of hashes. A phone can verify its own coins without trusting the node it asks. Every hash is domain-separated; nothing can be mistaken for anything else."
-             data-ru="Состояние живёт в разреженном дереве Меркла, поэтому любой баланс доказуем — и наличие, и отсутствие — горсткой хешей. Телефон проверяет свои монеты, не доверяя узлу, у которого спрашивает. Каждый хеш разделён доменом — ничто нельзя выдать за другое.">
-            State lives in a sparse Merkle tree, so any balance can be proven — present or absent — with a handful of hashes. A phone can verify its own coins without trusting the node it asks. Every hash is domain-separated; nothing can be mistaken for anything else.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
+        <div class="rg-val">V2</div>
+        <div class="cell" data-step="pr" data-v="2"><i></i></div>
+        <div class="cell" data-step="pv" data-v="2"><i></i></div>
+        <div class="cell" data-step="pc" data-v="2"><i></i></div>
 
-  <!-- ROADMAP -->
-  <section class="section wrap" id="roadmap">
-    <div class="section-head">
-      <span class="eyebrow" data-en="The watch ahead" data-ru="Вахта впереди">The watch ahead</span>
-      <h2 data-en="Where the build stands." data-ru="Где сейчас стройка.">Where the build stands.</h2>
-      <p data-en="Honest status. The foundation is laid and adversarially tested; the network learns to run itself next."
-         data-ru="Честный статус. Фундамент заложен и проверен на прочность; дальше сеть учится работать сама.">
-        Honest status. The foundation is laid and adversarially tested; the network learns to run itself next.
-      </p>
-    </div>
-    <div class="road" id="road">
-      <div class="draw" id="roadDraw" aria-hidden="true"></div>
-      <div class="stage done">
-        <span class="node"></span>
-        <div class="st" data-en="Done" data-ru="Готово">Done</div>
-        <h3 data-en="The core" data-ru="Ядро">The core</h3>
-        <p data-en="Blocks, keys and wallet, transactions, state on disk, genesis and chain storage — built and hardened to a strict security rulebook, every fix pinned by a test."
-           data-ru="Блоки, ключи и кошелёк, транзакции, состояние на диске, генезис и хранение цепочки — собраны и укреплены по строгому своду правил безопасности, каждое исправление закреплено тестом.">
-          Blocks, keys and wallet, transactions, state on disk, genesis and chain storage — built and hardened to a strict security rulebook, every fix pinned by a test.
-        </p>
+        <div class="rg-val rg-last">V3</div>
+        <div class="cell rg-last" data-step="pr" data-v="3"><i></i></div>
+        <div class="cell rg-last" data-step="pv" data-v="3"><i></i></div>
+        <div class="cell rg-last" data-step="pc" data-v="3"><i></i></div>
       </div>
-      <div class="stage now">
-        <span class="node"><b></b></span>
-        <div class="st" data-en="In progress" data-ru="В работе">In progress</div>
-        <h3 data-en="Consensus" data-ru="Консенсус">Consensus</h3>
-        <p data-en="Validators take turns, sign blocks and prove their right to. The network starts producing blocks on its own schedule."
-           data-ru="Валидаторы ходят по очереди, подписывают блоки и доказывают своё право. Сеть начинает производить блоки по собственному расписанию.">
-          Validators take turns, sign blocks and prove their right to. The network starts producing blocks on its own schedule.
-        </p>
+      <p class="round-state" id="round-state" aria-hidden="true"><span lang="en"><b>Decided.</b> 4 of 4 precommits — block h is final.</span><span lang="ru"><b>Решено.</b> 4 из 4 окончательных голосов — блок h окончателен.</span></p>
+      <div class="round-foot">
+        <div><b>3 / 4</b><span lang="en">quorum, ⌈2n/3⌉</span><span lang="ru">кворум, ⌈2n/3⌉</span></div>
+        <div><b>1</b><span lang="en">faulty validator tolerated</span><span lang="ru">сбойный валидатор допустим</span></div>
+        <div><b><span lang="en">4 s</span><span lang="ru">4 с</span></b><span lang="en">to the next height</span><span lang="ru">до следующей высоты</span></div>
       </div>
-      <div class="stage">
-        <span class="node"></span>
-        <div class="st" data-en="Next" data-ru="Дальше">Next</div>
-        <h3 data-en="Mempool & network" data-ru="Мемпул и сеть">Mempool &amp; network</h3>
-        <p data-en="Transactions queue, spread between nodes and sync from zero. Several machines find each other and keep one shared ledger."
-           data-ru="Транзакции встают в очередь, расходятся между узлами и синхронизируются с нуля. Несколько машин находят друг друга и держат один общий реестр.">
-          Transactions queue, spread between nodes and sync from zero. Several machines find each other and keep one shared ledger.
-        </p>
-      </div>
-      <div class="stage">
-        <span class="node"></span>
-        <div class="st" data-en="Then" data-ru="Затем">Then</div>
-        <h3 data-en="Testnet, then launch" data-ru="Тестнет, затем запуск">Testnet, then launch</h3>
-        <p data-en="A public test network runs day and night, then the real one opens. Wallet, explorer and fiat on-ramps come with it."
-           data-ru="Публичная тестовая сеть работает днём и ночью, затем открывается настоящая. Вместе с ней — кошелёк, обозреватель и фиатные шлюзы.">
-          A public test network runs day and night, then the real one opens. Wallet, explorer and fiat on-ramps come with it.
-        </p>
-      </div>
-    </div>
-  </section>
+      <figcaption class="round-cap" id="round-cap">
+        <span lang="en">One height of Phylox consensus with four validators, as on the test bench: the proposer offers a block, validators prevote and then precommit; three precommits out of four decide it. Illustration, not live network data.</span>
+        <span lang="ru">Одна высота консенсуса Phylox с четырьмя валидаторами, как на стенде: сборщик предлагает блок, валидаторы голосуют предварительно, затем окончательно; трёх окончательных голосов из четырёх достаточно для решения. Иллюстрация, а не данные живой сети.</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
 
-  <!-- FINALE -->
-  <section class="finale wrap">
-    <span class="eyebrow" style="justify-content:center" data-en="Coming 2026" data-ru="Запуск в 2026">Coming 2026</span>
-    <h2 data-en="Stand watch with us." data-ru="Встаньте на вахту с нами.">Stand watch with us.</h2>
-    <p class="tag" data-en="The guardian is almost awake." data-ru="Страж почти проснулся.">The guardian is almost awake.</p>
-    <a class="btn" href="#top" style="margin-inline:auto"><span data-en="Follow the build" data-ru="Следить за стройкой">Follow the build</span><span class="dot"></span></a>
-  </section>
+<!-- ============ KEY NUMBERS ============ -->
+<section class="stats" aria-label="Key parameters">
+  <div class="wrap">
+    <ul>
+      <li><div class="stat-v">4<small lang="en">s</small><small lang="ru">с</small></div><div class="stat-l"><span lang="en">Block interval</span><span lang="ru">Интервал блока</span></div></li>
+      <li><div class="stat-v">1<small lang="en">block</small><small lang="ru">блок</small></div><div class="stat-l"><span lang="en">To finality. No reorgs</span><span lang="ru">До финальности. Без откатов</span></div></li>
+      <li><div class="stat-v"><span lang="en">0.0001</span><span lang="ru">0,0001</span><small>YLX</small></div><div class="stat-l"><span lang="en">Fee for a basic transfer</span><span lang="ru">Комиссия простого перевода</span></div></li>
+      <li><div class="stat-v">~455<small lang="en">tx/s</small><small lang="ru">пер./с</small></div><div class="stat-l"><span lang="en">Capacity at 256 KiB per block</span><span lang="ru">Пропускная способность при блоке 256 КиБ</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ PARAMETERS ============ -->
+<section class="section" id="protocol" aria-labelledby="protocol-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2 id="protocol-h"><span lang="en">Protocol parameters</span><span lang="ru">Параметры протокола</span></h2>
+      <p lang="en">Every value below is a constant in the node’s <code>params</code> package. A test compares each constant, by name and value, with the parameter table of the specification, so the code and the documents cannot drift apart.</p>
+      <p lang="ru">Каждое значение ниже — константа пакета <code>params</code> узла. Тест сверяет каждую константу по имени и значению с таблицей параметров спецификации, поэтому код и документы не могут разойтись.</p>
+    </div>
+
+    <table class="ptable reveal">
+      <caption class="sr-only"><span lang="en">Phylox protocol parameters</span><span lang="ru">Параметры протокола Phylox</span></caption>
+      <thead><tr>
+        <th scope="col"><span lang="en">Parameter</span><span lang="ru">Параметр</span></th>
+        <th scope="col"><span lang="en">Value</span><span lang="ru">Значение</span></th>
+        <th scope="col"><span lang="en">In code</span><span lang="ru">В коде</span></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <th scope="row"><span lang="en">Block interval</span><span lang="ru">Интервал блока</span></th>
+          <td class="v"><span lang="en">4 seconds</span><span lang="ru">4 секунды</span></td>
+          <td class="c"><code>BlockInterval = 4 * time.Second</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Finality</span><span lang="ru">Финальность</span></th>
+          <td class="v"><span lang="en">Single block. A block signed by ⌈2n/3⌉ validators is never rolled back</span><span lang="ru">Один блок. Блок с подписями ⌈2n/3⌉ валидаторов не откатывается никогда</span></td>
+          <td class="c"><code>ConsensusThresholdNum/Den = 2/3</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Block size</span><span lang="ru">Лимит блока</span></th>
+          <td class="v"><span lang="en">256 KiB</span><span lang="ru">256 КиБ</span>
+            <span class="hint" lang="en">Up to 1,820 minimal 144-byte transfers per block, about 455 per second</span>
+            <span class="hint" lang="ru">До 1&nbsp;820 минимальных переводов по 144 байта в блоке, около 455 в секунду</span></td>
+          <td class="c"><code>MaxBlockSize = 256 * 1024</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Validator set</span><span lang="ru">Состав валидаторов</span></th>
+          <td class="v"><span lang="en">Equal votes, up to 100 validators</span><span lang="ru">Равные голоса, до 100 валидаторов</span>
+            <span class="hint" lang="en">Tolerates ⌊(n−1)/3⌋ faulty validators</span>
+            <span class="hint" lang="ru">Выдерживает ⌊(n−1)/3⌋ недобросовестных</span></td>
+          <td class="c"><code>MaxValidators = 100</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Initial supply</span><span lang="ru">Начальное предложение</span></th>
+          <td class="v"><span lang="en">100,000,000 YLX at genesis</span><span lang="ru">100&nbsp;000&nbsp;000 YLX в генезисе</span></td>
+          <td class="c"><code>InitialSupply = 100_000_000</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Issuance</span><span lang="ru">Эмиссия</span></th>
+          <td class="v"><span lang="en">5% of the initial supply in year 1, then 4%, 3%, 2%; 1% a year from year 5 on</span><span lang="ru">5% от начального предложения в первый год, затем 4%, 3%, 2%; с пятого года — 1% в год</span>
+            <span class="hint" lang="en">A year is 7,884,000 blocks; nodes count height, not calendar time</span>
+            <span class="hint" lang="ru">Год — 7&nbsp;884&nbsp;000 блоков; узлы считают высоту, а не календарь</span></td>
+          <td class="c"><code>InflationFirstYearBP = 500</code> <code>InflationFloorBP = 100</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Block reward</span><span lang="ru">Награда за блок</span></th>
+          <td class="v"><span lang="en">10% to the proposer, 90% split among validators whose signatures are in the parent commit</span><span lang="ru">10% сборщику, 90% — поровну валидаторам, чьи подписи есть в коммите родителя</span>
+            <span class="hint" lang="en">Shares of absent validators are not minted</span>
+            <span class="hint" lang="ru">Доли отсутствующих не печатаются</span></td>
+          <td class="c"><code>ProposerShareBP = 1_000</code> <code>VoterShareBP = 9_000</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Fee burn</span><span lang="ru">Сжигание</span></th>
+          <td class="v"><span lang="en">50% of block fees are burned; the other half goes to the proposer</span><span lang="ru">50% комиссий блока сжигается, вторая половина — сборщику</span></td>
+          <td class="c"><code>BurnShareBP = 5_000</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Base fee</span><span lang="ru">Базовая комиссия</span></th>
+          <td class="v"><span lang="en">0.0001 YLX for a minimal transfer (695 nano per unit of weight)</span><span lang="ru">0,0001 YLX за минимальный перевод (695 нано за единицу веса)</span>
+            <span class="hint" lang="en">Automatic adjustment, ±12.5% per block around a 50% fill target, is specified but not yet active</span>
+            <span class="hint" lang="ru">Автоподстройка на ±12,5% за блок вокруг загрузки 50% описана в спецификации, но ещё не включена</span></td>
+          <td class="c"><code>MinFeeNano = 100_000</code> <code>BaseFeePerWeightNano = 695</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">New-account surcharge</span><span lang="ru">Доплата за новый адрес</span></th>
+          <td class="v"><span lang="en">0.001 YLX on the first transfer to an address; burned in full</span><span lang="ru">0,001 YLX за первый перевод на адрес; сжигается целиком</span></td>
+          <td class="c"><code>AccountCreationFeeNano</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Precision</span><span lang="ru">Точность</span></th>
+          <td class="v"><span lang="en">9 decimals: 1 YLX = 10⁹ nano. Integer arithmetic only</span><span lang="ru">9 знаков: 1 YLX = 10⁹ нано. Только целочисленная арифметика</span></td>
+          <td class="c"><code>Decimals = 9</code></td>
+        </tr>
+        <tr>
+          <th scope="row">Chain ID</th>
+          <td class="v"><span lang="en">897688 (test network: 897689), signed into every transaction</span><span lang="ru">897688 (тестовая сеть — 897689), входит в подпись каждой транзакции</span></td>
+          <td class="c"><code>ChainID = 897688</code></td>
+        </tr>
+        <tr>
+          <th scope="row"><span lang="en">Cryptography</span><span lang="ru">Криптография</span></th>
+          <td class="v"><span lang="en">ECDSA secp256k1 with low-s signatures; Keccak-256 with a separate domain for every hash; Ethereum-format addresses</span><span lang="ru">ECDSA secp256k1, только low-s; Keccak-256 с отдельным доменом для каждого хеша; адреса в формате Ethereum</span></td>
+          <td class="c"><code>Domain* = "phylox/…/v1"</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="table-note"><span lang="en">Capacity is computed from the measured size of a minimal signed transfer; it is a protocol ceiling, not a benchmark of a public network.</span><span lang="ru">Пропускная способность вычислена из измеренного размера минимального подписанного перевода; это потолок протокола, а не замер публичной сети.</span></p>
+  </div>
+</section>
+
+<!-- ============ DESIGN ============ -->
+<section class="section alt" id="design" aria-labelledby="design-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2 id="design-h"><span lang="en">How it works</span><span lang="ru">Как устроено</span></h2>
+      <p lang="en">Phylox does one thing — moves value between accounts — and keeps every part of that path small enough to reason about. Each decision has a written record with its trade-offs and known weak points.</p>
+      <p lang="ru">Phylox делает одно — переводит ценность между аккаунтами — и держит каждую часть этого пути достаточно простой, чтобы о ней можно было рассуждать. У каждого решения есть запись с ценой выбора и известными слабыми местами.</p>
+    </div>
+
+    <div class="cards">
+      <article class="card reveal">
+        <h3><span lang="en">BFT consensus, built from scratch</span><span lang="ru">BFT-консенсус, написанный с нуля</span></h3>
+        <p lang="en">A Tendermint-style protocol implemented in Go rather than taken from CometBFT. A proposer chosen in turn offers a block; validators prevote, then precommit, and ⌈2n/3⌉ precommits decide it.</p>
+        <p lang="ru">Протокол в духе Tendermint, реализованный на Go, а не взятый из CometBFT. Сборщик по очереди предлагает блок; валидаторы голосуют предварительно, затем окончательно, и ⌈2n/3⌉ окончательных голосов решают его судьбу.</p>
+        <ul lang="en">
+          <li>Locking and proof-of-lock rules keep safety across rounds</li>
+          <li>Timeouts: proposal 3 s + 0.5 s per round, votes 1 s + 0.5 s</li>
+          <li>On-disk guard refuses to sign twice at the same height and round</li>
+        </ul>
+        <ul lang="ru">
+          <li>Блокировка и доказательство блокировки сохраняют безопасность между раундами</li>
+          <li>Сроки: предложение 3 с + 0,5 с на раунд, голоса 1 с + 0,5 с</li>
+          <li>Защита на диске не даёт подписать дважды на одной высоте и раунде</li>
+        </ul>
+        <p class="ref"><span>SPEC §6 · ADR-0031</span></p>
+      </article>
+
+      <article class="card reveal">
+        <h3><span lang="en">Final in one block</span><span lang="ru">Окончательно за один блок</span></h3>
+        <p lang="en">Any two quorums of two thirds share at least one honest validator, so two different blocks at the same height cannot both be decided. There are no forks to wait out: a transfer is final when its block is.</p>
+        <p lang="ru">Два кворума по две трети всегда пересекаются хотя бы в одном честном валидаторе, поэтому два разных блока на одной высоте решены быть не могут. Ждать подтверждений не нужно: перевод окончателен вместе со своим блоком.</p>
+        <ul lang="en">
+          <li>Every block carries the commit of its parent</li>
+          <li>No block is executed before its commit is verified, including blocks received during sync</li>
+          <li>The chain keeps going with three of four validators online</li>
+        </ul>
+        <ul lang="ru">
+          <li>Каждый блок несёт коммит своего родителя</li>
+          <li>Ни один блок не исполняется до проверки коммита — и при синхронизации тоже</li>
+          <li>Сеть продолжает работу при трёх валидаторах из четырёх</li>
+        </ul>
+        <p class="ref"><span>SPEC §5–6 · ADR-0031</span></p>
+      </article>
+
+      <article class="card reveal">
+        <h3><span lang="en">State with Merkle proofs</span><span lang="ru">Состояние с доказательствами Меркла</span></h3>
+        <p lang="en">Accounts hold balances and nonces. State is stored flat in Pebble for one-read lookups and committed to a binary sparse Merkle tree whose root is in every block header.</p>
+        <p lang="ru">Аккаунты хранят баланс и счётчик. Состояние лежит в Pebble плоско — одно чтение на запрос — и фиксируется двоичным разреженным деревом Меркла, корень которого есть в каждом заголовке.</p>
+        <ul lang="en">
+          <li>Proofs of inclusion and of absence</li>
+          <li>Transactions committed by a Merkle root, with their count under the header hash</li>
+          <li>A block applies atomically, or not at all</li>
+        </ul>
+        <ul lang="ru">
+          <li>Доказательства наличия и отсутствия</li>
+          <li>Транзакции заверены корнем Меркла, их число — под хешем заголовка</li>
+          <li>Блок применяется целиком или не применяется вовсе</li>
+        </ul>
+        <p class="ref"><span>SPEC §5, §8 · ADR-0020</span></p>
+      </article>
+
+      <article class="card reveal">
+        <h3><span lang="en">Issuance and fee burn</span><span lang="ru">Эмиссия и сжигание</span></h3>
+        <p lang="en">Every node computes the block reward from the block height with integer arithmetic, rounding down. A validator cannot write its own reward into a block.</p>
+        <p lang="ru">Каждый узел вычисляет награду из высоты блока целочисленно, с округлением вниз. Валидатор не может вписать себе награду в блок.</p>
+        <ul lang="en">
+          <li>10% to the proposer, 90% to the signers of the parent commit</li>
+          <li>Half of every fee is burned, so net issuance shrinks as usage grows</li>
+          <li>The new-account surcharge is burned in full</li>
+        </ul>
+        <ul lang="ru">
+          <li>10% сборщику, 90% подписавшим коммит родителя</li>
+          <li>Половина каждой комиссии сгорает: чем больше переводов, тем меньше чистый прирост предложения</li>
+          <li>Доплата за новый адрес сгорает целиком</li>
+        </ul>
+        <p class="ref"><span>SPEC §7 · ADR-0007</span></p>
+      </article>
+
+      <article class="card reveal">
+        <h3><span lang="en">Validator set in chain state</span><span lang="ru">Состав валидаторов в состоянии сети</span></h3>
+        <p lang="en">Membership is part of the state, not a configuration file. Each validator has an owner: a separate cold address that receives rewards and votes on who joins or leaves.</p>
+        <p lang="ru">Состав — часть состояния сети, а не файл настроек. У каждого валидатора есть владелец: отдельный холодный адрес, который получает награды и голосует, кого включить или исключить.</p>
+        <ul lang="en">
+          <li>Add, remove or change owner by a two-thirds vote of owners</li>
+          <li>The node key holds no funds</li>
+          <li>Evidence of a double vote removes a validator at the next height</li>
+        </ul>
+        <ul lang="ru">
+          <li>Включение, исключение и смена владельца — голосованием двух третей владельцев</li>
+          <li>Ключ узла денег не держит</li>
+          <li>Доказательство двойного голоса исключает валидатора со следующей высоты</li>
+        </ul>
+        <p class="ref"><span>SPEC §6 · ADR-0031</span></p>
+      </article>
+
+      <article class="card reveal">
+        <h3><span lang="en">Network and keys</span><span lang="ru">Сеть и ключи</span></h3>
+        <p lang="en">Peers connect over TCP with a Noise XX handshake bound to the chain ID and genesis. A node listens only on 127.0.0.1 until its operator opens it, so the operator’s IP is not announced by default.</p>
+        <p lang="ru">Узлы соединяются по TCP через рукопожатие Noise XX, привязанное к номеру сети и генезису. Пока оператор сам не откроет узел, тот слушает только 127.0.0.1, и IP оператора в сеть не уходит.</p>
+        <ul lang="en">
+          <li>Peer scoring and bans by key and IP</li>
+          <li>Wallet keystore: Argon2id + XChaCha20-Poly1305; the key never leaves the wallet</li>
+          <li>Node RPC on loopback only, with a fresh token on every start</li>
+        </ul>
+        <ul lang="ru">
+          <li>Штрафные очки и баны по ключу и IP</li>
+          <li>Хранилище ключа: Argon2id + XChaCha20-Poly1305; ключ не покидает кошелёк</li>
+          <li>RPC узла — только на loopback, с новым токеном при каждом запуске</li>
+        </ul>
+        <p class="ref"><span>SPEC §9–11 · ADR-0026, ADR-0027</span></p>
+      </article>
+    </div>
+
+    <h3 class="sub-h reveal"><span lang="en">Life of a transfer</span><span lang="ru">Путь перевода</span></h3>
+    <ol class="flow reveal">
+      <li><span class="k"><span lang="en">Wallet</span><span lang="ru">Кошелёк</span></span>
+        <h3><span lang="en">Sign</span><span lang="ru">Подпись</span></h3>
+        <p lang="en">The wallet signs locally: a native transfer, or a legacy Ethereum (EIP-155) transfer from MetaMask.</p>
+        <p lang="ru">Кошелёк подписывает у себя: родной перевод или перевод Ethereum (legacy, EIP-155) из MetaMask.</p></li>
+      <li><span class="k"><span lang="en">Mempool</span><span lang="ru">Очередь</span></span>
+        <h3><span lang="en">Admit</span><span lang="ru">Приём</span></h3>
+        <p lang="en">Form, validity window, fee, signature, nonce and balance are checked before the transaction takes any space.</p>
+        <p lang="ru">Форма, окно жизни, комиссия, подпись, счётчик и баланс проверяются до того, как транзакция займёт место.</p></li>
+      <li><span class="k"><span lang="en">Proposer</span><span lang="ru">Сборщик</span></span>
+        <h3><span lang="en">Propose</span><span lang="ru">Предложение</span></h3>
+        <p lang="en">Up to 256 KiB of transactions, each dry-run against the state, so the offered block is valid.</p>
+        <p lang="ru">До 256 КиБ транзакций, каждая прогнана по состоянию заранее, поэтому предложенный блок годен.</p></li>
+      <li><span class="k"><span lang="en">Validators</span><span lang="ru">Валидаторы</span></span>
+        <h3><span lang="en">Decide</span><span lang="ru">Решение</span></h3>
+        <p lang="en">Prevote, then precommit. ⌈2n/3⌉ precommits decide the block, and it is final.</p>
+        <p lang="ru">Предварительный голос, затем окончательный. ⌈2n/3⌉ окончательных голосов решают блок — он окончателен.</p></li>
+      <li><span class="k"><span lang="en">Every node</span><span lang="ru">Каждый узел</span></span>
+        <h3><span lang="en">Commit</span><span lang="ru">Запись</span></h3>
+        <p lang="en">State changes are written atomically with the new state root; the commit signatures travel in the next block.</p>
+        <p lang="ru">Изменения состояния записываются одной пачкой с новым корнем; подписи коммита уходят в следующий блок.</p></li>
+    </ol>
+    <p class="flow-note"><span lang="en">In practice a transfer lands in a block within 4–8 seconds and is final immediately.</span><span lang="ru">На практике перевод попадает в блок за 4–8 секунд и сразу становится окончательным.</span></p>
+  </div>
+</section>
+
+<!-- ============ VERIFICATION ============ -->
+<section class="section band" id="verification" aria-labelledby="verification-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2 id="verification-h"><span lang="en">What has been verified</span><span lang="ru">Что проверено</span></h2>
+      <p lang="en">Figures on this page come from the project’s verification log: each claim names the test or the recorded run behind it. Failed runs are listed alongside the passed ones.</p>
+      <p lang="ru">Цифры на этой странице взяты из журнала проверок проекта: у каждого утверждения названа проверка или записанный прогон. Неудачные прогоны перечислены рядом с удачными.</p>
+    </div>
+
+    <div class="result reveal">
+      <div class="result-main">
+        <div class="verdict">
+          <span class="badge badge-pass"><span lang="en">Passed</span><span lang="ru">Пройден</span></span>
+          <span class="what"><span lang="en">24-hour soak test · 13–14 October 2026 · Go 1.27.2</span><span lang="ru">Суточный прогон · 13–14 октября 2026 · Go 1.27.2</span></span>
+        </div>
+        <h3><span lang="en">Four validators and an observer ran for a full day under load, with a validator killed every hour. The monitor recorded no failures.</span><span lang="ru">Четыре валидатора и наблюдатель проработали сутки под нагрузкой, раз в час один валидатор принудительно останавливался. Монитор не записал ни одного сбоя.</span></h3>
+        <div class="metrics">
+          <div><b><span lang="en">24 h 00 m</span><span lang="ru">24 ч 00 мин</span></b><span lang="en">continuous run, no intervention</span><span lang="ru">без вмешательства</span></div>
+          <div><b><span lang="en">21,349</span><span lang="ru">21&nbsp;349</span></b><span lang="en">blocks, same height on all 5 nodes</span><span lang="ru">блоков, одна высота у всех 5 узлов</span></div>
+          <div><b>0</b><span lang="en">failures by the monitor’s rules</span><span lang="ru">сбоев по правилам монитора</span></div>
+          <div><b>23</b><span lang="en">forced validator kills, one an hour</span><span lang="ru">принудительные остановки валидаторов, раз в час</span></div>
+          <div><b>24</b><span lang="en">one-minute bursts of 700 tx/s, ~1.5× block capacity</span><span lang="ru">минутных всплеска по 700 пер./с — в 1,5 раза больше вместимости блоков</span></div>
+          <div><b><span lang="en">128 MiB</span><span lang="ru">128 МиБ</span></b><span lang="en">peak heap per validator; no leaks</span><span lang="ru">наибольшая куча валидатора; утечек нет</span></div>
+        </div>
+      </div>
+      <div class="result-side">
+        <h4><span lang="en">Failure rules, fixed in numbers before the run</span><span lang="ru">Правила сбоя, записанные числами до прогона</span></h4>
+        <ul lang="en">
+          <li>No new block for longer than 30 seconds</li>
+          <li>A fork, or diverging state between nodes</li>
+          <li>Any peer ban</li>
+          <li>A restarted node not caught up within 3 minutes</li>
+          <li>Any mempool not drained 3 minutes after a burst</li>
+          <li>Heap or goroutines growing steadily to 3× the first-hour peak, or above 2 GiB / 10,000</li>
+        </ul>
+        <ul lang="ru">
+          <li>Новых блоков нет дольше 30 секунд</li>
+          <li>Развилка или расхождение состояния между узлами</li>
+          <li>Любой бан пира</li>
+          <li>Перезапущенный узел не догнал сеть за 3 минуты</li>
+          <li>Очередь любого узла не опустела за 3 минуты после всплеска</li>
+          <li>Куча или горутины монотонно растут до тройного пика первого часа или выше 2 ГиБ / 10&nbsp;000</li>
+        </ul>
+        <p class="src">VERIFICATION · ADR-0029, ADR-0034</p>
+      </div>
+    </div>
+
+    <h3 class="sub-h reveal"><span lang="en">Every 24-hour run so far</span><span lang="ru">Все суточные прогоны</span></h3>
+    <div class="table-scroll reveal" tabindex="0" role="region" aria-label="Soak test history">
+      <table class="htable">
+        <thead><tr>
+          <th scope="col"><span lang="en">Dates (2026)</span><span lang="ru">Даты (2026)</span></th>
+          <th scope="col"><span lang="en">Result</span><span lang="ru">Итог</span></th>
+          <th scope="col"><span lang="en">What happened</span><span lang="ru">Что было</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td><span lang="en">4–5 Oct</span><span lang="ru">4–5 окт.</span></td><td><span class="badge badge-pass"><span lang="en">Passed</span><span lang="ru">Пройден</span></span></td>
+            <td><span lang="en">First run on BFT. Height 21,313; after a further 17 hours, block hashes matched on all five nodes at every one of 36,743 heights.</span><span lang="ru">Первый прогон на BFT. Высота 21&nbsp;313; ещё через 17 часов хеши блоков совпали у всех пяти узлов на всех 36&nbsp;743 высотах.</span></td></tr>
+          <tr><td><span lang="en">6 Oct</span><span lang="ru">6 окт.</span></td><td><span class="badge badge-fail"><span lang="en">Failed</span><span lang="ru">Не пройден</span></span></td>
+            <td><span lang="en">A peer was banned for message rate in the first load burst. Fixed (ADR-0037) and rerun the same day.</span><span lang="ru">В первом же всплеске нагрузки пир получил бан за скорость сообщений. Исправлено (ADR-0037), прогон повторён в тот же день.</span></td></tr>
+          <tr><td><span lang="en">6–7 Oct</span><span lang="ru">6–7 окт.</span></td><td><span class="badge badge-pass"><span lang="en">Passed</span><span lang="ru">Пройден</span></span></td>
+            <td><span lang="en">With the block explorer indexing alongside. Height 21,307, no bans, no leaks.</span><span lang="ru">Вместе с работающим обозревателем. Высота 21&nbsp;307, банов и утечек нет.</span></td></tr>
+          <tr><td><span lang="en">7–8 Oct</span><span lang="ru">7–8 окт.</span></td><td><span class="badge badge-fail"><span lang="en">Failed</span><span lang="ru">Не пройден</span></span></td>
+            <td><span lang="en">Five stalls of 34–52 seconds within 12 minutes. Traced to the host PC freezing — all nodes and the load generator went silent at once — not to the protocol.</span><span lang="ru">Пять остановок по 34–52 секунды за 12 минут. Причина — зависания самого ПК (все узлы и нагрузчик замолкали разом), а не протокол.</span></td></tr>
+          <tr><td><span lang="en">8–9 Oct</span><span lang="ru">8–9 окт.</span></td><td><span class="badge badge-pass"><span lang="en">Passed</span><span lang="ru">Пройден</span></span></td>
+            <td><span lang="en">Rerun on a quiet host. Height 21,336. Built with Go 1.27.0.</span><span lang="ru">Повтор на ненагруженном ПК. Высота 21&nbsp;336. Сборка на Go 1.27.0.</span></td></tr>
+          <tr><td><span lang="en">10–13 Oct</span><span lang="ru">10–13 окт.</span></td><td><span class="badge badge-skip"><span lang="en">Not passed</span><span lang="ru">Не засчитаны</span></span></td>
+            <td><span lang="en">Attempts after moving to Go 1.27.2 failed or were cut short. Causes found: host pauses of up to 190 seconds (the monitor now measures and subtracts them) and a metrics bug that briefly showed a restarted validator as outside the set (fixed, with a test). Two attempts were stopped externally with no protocol failures.</span><span lang="ru">Попытки после перехода на Go 1.27.2 падали или прерывались. Найденные причины: паузы ПК до 190 секунд (монитор теперь их измеряет и вычитает) и ошибка метрик, из-за которой перезапущенный валидатор на мгновение выглядел вне состава (исправлено, с тестом). Две попытки остановлены извне, сбоев протокола в них не было.</span></td></tr>
+          <tr><td><span lang="en">13–14 Oct</span><span lang="ru">13–14 окт.</span></td><td><span class="badge badge-pass"><span lang="en">Passed</span><span lang="ru">Пройден</span></span></td>
+            <td><span lang="en">Go 1.27.2. Height 21,349, zero host pauses. The full check suite and the release build passed afterwards.</span><span lang="ru">Go 1.27.2. Высота 21&nbsp;349, пауз хоста 0. После прогона полная проверка и сборка релиза прошли.</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-h reveal"><span lang="en">Engineering checks</span><span lang="ru">Инженерные проверки</span></h3>
+    <div class="checks reveal">
+      <div><b>12 / 12</b>
+        <h4><span lang="en">Steps in the full check</span><span lang="ru">Шагов полной проверки</span></h4>
+        <p lang="en">Formatting, build, vet, tests, race detector, project rules, 32-bit build and tests, throughput, scripts, linter, dependency vulnerability scan.</p>
+        <p lang="ru">Форматирование, сборка, vet, тесты, детектор гонок, правила проекта, сборка и тесты под 32 бита, пропускная способность, скрипты, линтер, уязвимости зависимостей.</p></div>
+      <div><b><span lang="en">94.9 M</span><span lang="ru">94,9 млн</span></b>
+        <h4><span lang="en">Fuzzing inputs</span><span lang="ru">Входов фаззинга</span></h4>
+        <p lang="en">Across the decoder and signature parsing, with no panics or round-trip mismatches. Fuzzing finds bugs; it does not prove their absence.</p>
+        <p lang="ru">Разбор байт, круговые проходы кодека и разбор подписей — ни одной паники и ни одного расхождения. Фаззинг находит ошибки, но не доказывает их отсутствие.</p></div>
+      <div><b>64 / 64</b>
+        <h4><span lang="en">Mutations caught</span><span lang="ru">Мутаций поймано</span></h4>
+        <p lang="en">Bugs deliberately put back into the code to confirm that the test named for each claim actually fails.</p>
+        <p lang="ru">Ошибки, намеренно возвращённые в код, чтобы убедиться: тест, названный для утверждения, действительно падает.</p></div>
+      <div><b>14</b>
+        <h4><span lang="en">Review findings, all fixed</span><span lang="ru">Находок проверки, все закрыты</span></h4>
+        <p lang="en">An internal adversarial review of the core, cryptography, encoding and state found 5 high- and 9 medium-severity issues. Each is now pinned by a regression test.</p>
+        <p lang="ru">Внутренняя состязательная проверка ядра, криптографии, кодека и состояния нашла 5 проблем высокой и 9 средней серьёзности. Каждая теперь закреплена регрессионным тестом.</p></div>
+      <div><b>16×</b>
+        <h4><span lang="en">Signature-check headroom</span><span lang="ru">Запас по проверке подписей</span></h4>
+        <p lang="en">A full block of signatures verifies in 248 ms against a 4-second interval. The check suite fails if headroom drops below 2×.</p>
+        <p lang="ru">Полный блок подписей проверяется за 248 мс при интервале 4 секунды. Проверка падает, если запас опустится ниже двукратного.</p></div>
+      <div><b>32 / 32</b>
+        <h4><span lang="en">Ethereum tooling checks</span><span lang="ru">Проверок с инструментами Ethereum</span></h4>
+        <p lang="en">eth-account (Python) and ethers v6 against a live node. MetaMask 13.50.0 added the network and sent two transfers that were included in blocks.</p>
+        <p lang="ru">eth-account (Python) и ethers v6 против живого узла. MetaMask 13.50.0 добавил сеть и отправил два перевода, оба вошли в блоки.</p></div>
+    </div>
+
+    <h3 class="sub-h reveal"><span lang="en">Not verified yet</span><span lang="ru">Ещё не проверено</span></h3>
+    <ul class="notyet reveal">
+      <li lang="en"><b>Independent external audit.</b> Not done. The network is not meant to carry real value before one.</li>
+      <li lang="ru"><b>Независимый внешний аудит.</b> Не проводился. До него сеть не должна нести реальную стоимость.</li>
+      <li lang="en"><b>Many machines over the internet.</b> Every run so far has been on one machine, with real network latency and loss untested.</li>
+      <li lang="ru"><b>Много машин через интернет.</b> Все прогоны пока на одной машине; реальные задержки и потери сети не проверены.</li>
+      <li lang="en"><b>A 24-hour run in containers.</b> The Docker bench is ready; the full-day run in it has not been done.</li>
+      <li lang="ru"><b>Суточный прогон в контейнерах.</b> Стенд в Docker готов, суточного прогона в нём ещё не было.</li>
+      <li lang="en"><b>Reproducible builds, confirmed by others.</b> Local rebuilds give identical checksums; outside confirmation is part of the launch plan.</li>
+      <li lang="ru"><b>Воспроизводимые сборки, подтверждённые другими.</b> Повторная сборка у автора даёт те же контрольные суммы; подтверждение посторонними — часть плана запуска.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ ROADMAP ============ -->
+<section class="section" id="roadmap" aria-labelledby="roadmap-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2 id="roadmap-h"><span lang="en">Roadmap</span><span lang="ru">План</span></h2>
+      <p lang="en">Status as of 15 October 2026. A phase starts only when the previous one meets its criterion; dates are the current plan, and if a criterion is not met, genesis moves.</p>
+      <p lang="ru">Статус на 15 октября 2026. Фаза начинается, только когда предыдущая выполнила свой критерий; даты — текущий план, и если критерий не выполнен, генезис сдвигается.</p>
+    </div>
+
+    <div class="rm-grid">
+      <ol class="phases reveal">
+        <li class="phase now"><span class="ix">A</span><div class="body">
+          <div class="row"><h3><span lang="en">Closed test network</span><span lang="ru">Закрытая тестовая сеть</span></h3><span class="chip chip-now"><span lang="en">Finishing</span><span lang="ru">Завершается</span></span></div>
+          <p lang="en">Criterion: a 24-hour run with no monitor failures — met by four runs, the latest on 14 October. Outstanding: the same run in containers.</p>
+          <p lang="ru">Критерий: суточный прогон без сбоев монитора — выполнен четырьмя прогонами, последний 14 октября. Осталось: такой же прогон в контейнерах.</p></div></li>
+        <li class="phase"><span class="ix">B</span><div class="body">
+          <div class="row"><h3><span lang="en">Public testnet with a faucet</span><span lang="ru">Публичная тестовая сеть с краном</span></h3><span class="chip chip-next"><span lang="en">Planned · Dec 2026</span><span lang="ru">План · декабрь 2026</span></span></div>
+          <p lang="en">Own servers, faucet, explorer, operator docs and the source code opened. Criterion: 30 days without a halt, an outsider runs a node from the docs and syncs, at least two external validators.</p>
+          <p lang="ru">Свои серверы, кран, обозреватель, документация операторов и открытый код. Критерий: 30 суток без остановки, посторонний поднимает узел по документации и догоняет сеть, не меньше двух внешних валидаторов.</p></div></li>
+        <li class="phase"><span class="ix">C</span><div class="body">
+          <div class="row"><h3><span lang="en">External audit and bug bounty</span><span lang="ru">Внешний аудит и баг-баунти</span></h3><span class="chip chip-next"><span lang="en">Planned</span><span lang="ru">План</span></span></div>
+          <p lang="en">Audit of networking, consensus, RPC, key storage, vesting and genesis; a bounty running on the testnet for at least four weeks. Criterion: all critical and high findings fixed and the report published.</p>
+          <p lang="ru">Аудит сети, консенсуса, RPC, хранилища ключей, блокировки и генезиса; программа вознаграждений на тестовой сети не меньше четырёх недель. Критерий: все критические и высокие находки закрыты, отчёт опубликован.</p></div></li>
+        <li class="phase"><span class="ix">D</span><div class="body">
+          <div class="row"><h3><span lang="en">Mainnet genesis</span><span lang="ru">Генезис основной сети</span></h3><span class="chip chip-next"><span lang="en">Target · Mar 2027</span><span lang="ru">Цель · март 2027</span></span></div>
+          <p lang="en">Genesis file published 14 days ahead, signed reproducible builds. Criterion: several independent people build the same binary hash and check the genesis.</p>
+          <p lang="ru">Файл генезиса публикуется за 14 дней, сборки подписаны и воспроизводимы. Критерий: несколько независимых людей собрали бинарник с тем же хешем и проверили генезис.</p></div></li>
+        <li class="phase"><span class="ix">E</span><div class="body">
+          <div class="row"><h3><span lang="en">First external validators</span><span lang="ru">Первые внешние валидаторы</span></h3><span class="chip chip-next"><span lang="en">After genesis</span><span lang="ru">После генезиса</span></span></div>
+          <p lang="en">Added by on-chain vote, followed by a public explorer and a simple wallet for people new to the network.</p>
+          <p lang="ru">Включаются голосованием в сети; следом — публичный обозреватель и простой кошелёк для новичков.</p></div></li>
+      </ol>
+
+      <div class="stages reveal">
+        <h3><span lang="en">Build stages</span><span lang="ru">Этапы разработки</span></h3>
+        <ol>
+          <li><span class="n">01</span><span><span lang="en">Core: types, hashing, Merkle tree</span><span lang="ru">Ядро: типы, хеши, дерево Меркла</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">02</span><span><span lang="en">Keys and wallet</span><span lang="ru">Ключи и кошелёк</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">03</span><span><span lang="en">Transactions and encoding</span><span lang="ru">Транзакции и кодек</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">04</span><span><span lang="en">State and Merkle proofs</span><span lang="ru">Состояние и доказательства</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">05</span><span><span lang="en">Genesis and chain storage</span><span lang="ru">Генезис и хранение цепочки</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">06</span><span><span lang="en">Proof-of-authority consensus</span><span lang="ru">Консенсус PoA</span></span><span class="s sup"><span lang="en">→ BFT</span><span lang="ru">→ BFT</span></span></li>
+          <li><span class="n">07</span><span><span lang="en">Mempool and block building</span><span lang="ru">Мемпул и сборка блоков</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">08</span><span><span lang="en">Peer-to-peer network</span><span lang="ru">Сеть узлов</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">09</span><span><span lang="en">RPC and command-line wallet</span><span lang="ru">RPC и кошелёк в командной строке</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">10</span><span><span lang="en">Local test network, load and monitor</span><span lang="ru">Тестовый стенд, нагрузка, монитор</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">11</span><span><span lang="en">BFT consensus</span><span lang="ru">Консенсус BFT</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">12</span><span><span lang="en">Block explorer</span><span lang="ru">Обозреватель</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">13</span><span><span lang="en">Ethereum wallet compatibility</span><span lang="ru">Совместимость с кошельками Ethereum</span></span><span class="s ok">✓</span></li>
+          <li><span class="n">14</span><span><span lang="en">Public launch</span><span lang="ru">Публичный запуск</span></span><span class="s wip"><span lang="en">in progress</span><span lang="ru">в работе</span></span></li>
+        </ol>
+        <p class="foot" lang="en">Stage 14 so far: genesis vesting enforced by the protocol, node operator guide, reproducible build script, CI. Next: servers, opening the source, code signing.</p>
+        <p class="foot" lang="ru">Сделано в этапе 14: блокировка долей генезиса правилом протокола, руководство оператора узла, скрипт воспроизводимой сборки, CI. Дальше: серверы, открытие кода, подпись программ.</p>
+      </div>
+    </div>
+
+    <h3 class="sub-h reveal"><span lang="en">Decentralization milestones</span><span lang="ru">Вехи децентрализации</span></h3>
+    <p class="sub-p reveal" lang="en">At genesis every validator will be run by the founder. That is stated up front, together with measurable steps to remove it — each one checkable by anyone from the validator list.</p>
+    <p class="sub-p reveal" lang="ru">В день генезиса все валидаторы будут у основателя. Это сказано заранее, вместе с измеримыми шагами, которые снимают эту зависимость, — каждый проверяется по списку валидаторов.</p>
+    <div class="miles">
+      <div class="mile reveal"><span class="k">M0</span>
+        <h4><span lang="en">Genesis</span><span lang="ru">Генезис</span></h4>
+        <p lang="en">All validators with the founder, announced together with the dates of the next milestones.</p>
+        <p lang="ru">Все валидаторы у основателя; объявлено вместе с датами следующих вех.</p>
+        <p class="when"><span lang="en">Day 0</span><span lang="ru">День 0</span></p></div>
+      <div class="mile reveal"><span class="k">M1</span>
+        <h4><span lang="en">No single party finalizes blocks</span><span lang="ru">Никто не финализирует блоки в одиночку</span></h4>
+        <p lang="en">The founder holds less than a quorum, e.g. 4 of 7 with a quorum of 5.</p>
+        <p lang="ru">У основателя меньше кворума, например 4 из 7 при кворуме 5.</p>
+        <p class="when"><span lang="en">Within 3 months</span><span lang="ru">До 3 месяцев</span></p></div>
+      <div class="mile reveal"><span class="k">M2</span>
+        <h4><span lang="en">No single party halts the chain</span><span lang="ru">Никто в одиночку не остановит сеть</span></h4>
+        <p lang="en">The founder runs at most ⌊(n−1)/3⌋ validators, e.g. 3 of 10, and cannot change membership alone.</p>
+        <p lang="ru">У основателя не больше ⌊(n−1)/3⌋ валидаторов, например 3 из 10, и состав он один не меняет.</p>
+        <p class="when"><span lang="en">Within 9 months</span><span lang="ru">До 9 месяцев</span></p></div>
+      <div class="mile reveal"><span class="k">M3</span>
+        <h4><span lang="en">No dominant operator</span><span lang="ru">Нет доминирующего оператора</span></h4>
+        <p lang="en">No operator above one third; at least 7 independent operators, 3 hosting providers and 2 countries.</p>
+        <p lang="ru">Ни у кого больше трети; не меньше 7 независимых операторов, 3 хостеров и 2 стран.</p>
+        <p class="when"><span lang="en">Within 18 months</span><span lang="ru">До 18 месяцев</span></p></div>
+    </div>
+
+    <div class="two">
+      <div class="listbox reveal">
+        <h3><span lang="en">After launch, in order of priority</span><span lang="ru">После запуска, по важности</span></h3>
+        <ol lang="en">
+          <li>Stealth addresses — the first privacy layer. Today all transfers are transparent</li>
+          <li>Mobile wallet with passkeys and social recovery</li>
+          <li>Short names instead of 42-character addresses</li>
+          <li>Snapshot sync for new nodes</li>
+          <li>Confidential amounts with zero-knowledge proofs</li>
+          <li>Automatic fee adjustment</li>
+        </ol>
+        <ol lang="ru">
+          <li>Скрытые адреса — первый слой приватности. Сейчас все переводы прозрачны</li>
+          <li>Мобильный кошелёк с passkey и социальным восстановлением</li>
+          <li>Короткие имена вместо адреса из 42 символов</li>
+          <li>Синхронизация по снимку состояния для новых узлов</li>
+          <li>Скрытые суммы на доказательствах с нулевым разглашением</li>
+          <li>Автоподстройка комиссии</li>
+        </ol>
+      </div>
+      <div class="listbox muted reveal">
+        <h3><span lang="en">Deliberately not before launch</span><span lang="ru">Сознательно не до запуска</span></h3>
+        <ul lang="en">
+          <li>Smart contracts and a virtual machine</li>
+          <li>Bridges to other chains</li>
+          <li>Tokens on top of the network</li>
+          <li>Staking and slashing — not until the coin has a market price</li>
+        </ul>
+        <ul lang="ru">
+          <li>Смарт-контракты и виртуальная машина</li>
+          <li>Мосты в другие сети</li>
+          <li>Токены поверх сети</li>
+          <li>Стейкинг и слэшинг — не раньше, чем у монеты появится рыночная цена</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ DEVELOPERS ============ -->
+<section class="section alt" id="developers" aria-labelledby="developers-h">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2 id="developers-h"><span lang="en">For developers</span><span lang="ru">Разработчикам</span></h2>
+      <p lang="en">The source code is not public yet; it opens with the public testnet. This is what the interfaces look like today. There is no public RPC endpoint: the addresses below belong to a node you run yourself.</p>
+      <p lang="ru">Исходный код пока закрыт и откроется вместе с публичной тестовой сетью. Ниже — как выглядят интерфейсы сегодня. Публичного RPC нет: адреса ниже относятся к узлу, который вы запускаете сами.</p>
+    </div>
+
+    <div class="dev-grid">
+      <div class="dev-list">
+        <div class="reveal">
+          <h3><span lang="en">Node and wallet</span><span lang="ru">Узел и кошелёк</span></h3>
+          <p lang="en"><code>phyloxd</code> runs a validator (with a key) or an observer. <code>phylox-cli</code> manages encrypted keystores, sends transfers, looks up transactions and votes on the validator set. Release builds for Linux (amd64, arm64) and Windows (amd64).</p>
+          <p lang="ru"><code>phyloxd</code> работает валидатором (с ключом) или наблюдателем. <code>phylox-cli</code> ведёт зашифрованные хранилища ключей, отправляет переводы, показывает транзакции и голосует за состав валидаторов. Сборки для Linux (amd64, arm64) и Windows (amd64).</p>
+        </div>
+        <div class="reveal">
+          <h3>JSON-RPC</h3>
+          <p lang="en">JSON-RPC 2.0 over HTTP, loopback only, with a bearer token the node writes to <code>rpc.cookie</code> on every start. Methods include <code>phylox_status</code>, <code>phylox_getAccount</code>, <code>phylox_sendRawTransaction</code>, <code>phylox_getBlockByHeight</code>, <code>phylox_getValidators</code> and <code>phylox_consensus</code>.</p>
+          <p lang="ru">JSON-RPC 2.0 поверх HTTP, только loopback, с токеном, который узел пишет в <code>rpc.cookie</code> при каждом запуске. Среди методов — <code>phylox_status</code>, <code>phylox_getAccount</code>, <code>phylox_sendRawTransaction</code>, <code>phylox_getBlockByHeight</code>, <code>phylox_getValidators</code> и <code>phylox_consensus</code>.</p>
+        </div>
+        <div class="reveal">
+          <h3><span lang="en">MetaMask and Ethereum libraries</span><span lang="ru">MetaMask и библиотеки Ethereum</span></h3>
+          <p lang="en">An optional <code>eth_*</code> endpoint lets MetaMask, ethers and similar tools send YLX. The wallet signs an ordinary legacy (EIP-155) transfer; no Snap or plugin is needed. The endpoint is read-only apart from submitting signed transfers.</p>
+          <p lang="ru">Необязательный эндпоинт <code>eth_*</code> позволяет MetaMask, ethers и похожим инструментам переводить YLX. Кошелёк подписывает обычный перевод legacy (EIP-155); Snap и дополнения не нужны. Кроме отправки подписанных переводов, эндпоинт только читает.</p>
+        </div>
+        <div class="reveal">
+          <h3><span lang="en">Explorer</span><span lang="ru">Обозреватель</span></h3>
+          <p lang="en">A separate read-only program indexes blocks, transactions and address history from a node over RPC and serves plain HTML pages, with no JavaScript and no external resources.</p>
+          <p lang="ru">Отдельная программа только для чтения: строит индекс блоков, транзакций и истории адресов по RPC узла и отдаёт простые HTML-страницы — без JavaScript и внешних ресурсов.</p>
+        </div>
+      </div>
+
+      <div>
+        <table class="mm reveal">
+          <caption class="sr-only"><span lang="en">Network identifiers and default ports</span><span lang="ru">Идентификаторы сети и порты по умолчанию</span></caption>
+          <thead><tr><th scope="col"></th><th scope="col"><span lang="en">Main network</span><span lang="ru">Основная</span></th><th scope="col"><span lang="en">Test network</span><span lang="ru">Тестовая</span></th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Chain ID</th><td>897688 <span class="hx">0xdb298</span></td><td>897689 <span class="hx">0xdb299</span></td></tr>
+            <tr><th scope="row"><span lang="en">Symbol</span><span lang="ru">Символ</span></th><td>YLX</td><td>YLX</td></tr>
+            <tr><th scope="row"><span lang="en">Decimals in wallets</span><span lang="ru">Знаков в кошельках</span></th><td>18</td><td>18</td></tr>
+            <tr><th scope="row">P2P</th><td>29768</td><td>29769</td></tr>
+            <tr><th scope="row">RPC <span class="hx">127.0.0.1</span></th><td>28768</td><td>28769</td></tr>
+            <tr><th scope="row">eth_* <span class="hx">127.0.0.1</span></th><td>25768</td><td>25769</td></tr>
+          </tbody>
+        </table>
+
+        <div class="code reveal" style="margin-top:16px">
+          <div class="code-head"><span lang="en">Node status over JSON-RPC</span><span lang="ru">Статус узла по JSON-RPC</span><span>bash</span></div>
+<pre tabindex="0"><code>curl -s http://127.0.0.1:28769/ \
+  -H <span class="s">"Authorization: Bearer $(cat data/rpc.cookie)"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"jsonrpc":"2.0","id":1,"method":"phylox_status","params":[]}'</span></code></pre>
+        </div>
+
+        <div class="code reveal">
+          <div class="code-head"><span lang="en">Add a local test node to MetaMask</span><span lang="ru">Добавить локальный тестовый узел в MetaMask</span><span>js</span></div>
+<pre tabindex="0"><code><span class="k">await</span> ethereum.request({
+  method: <span class="s">"wallet_addEthereumChain"</span>,
+  params: [{
+    chainId: <span class="s">"0xdb299"</span>,
+    chainName: <span class="s">"Phylox Testnet"</span>,
+    nativeCurrency: { name: <span class="s">"Phylox"</span>, symbol: <span class="s">"YLX"</span>, decimals: 18 },
+    rpcUrls: [<span class="s">"http://127.0.0.1:25769"</span>]
+  }]
+});</code></pre>
+        </div>
+
+        <p class="callout reveal" lang="en">Phylox is not an EVM. There are no smart contracts or tokens: a transfer with non-empty <code>data</code> is rejected and <code>eth_call</code> returns <code>0x</code>. Native YLX has 9 decimals; wallets see 18, so amounts must be whole multiples of 10⁹ wei.</p>
+        <p class="callout reveal" lang="ru">Phylox — не EVM. Смарт-контрактов и токенов нет: перевод с непустым <code>data</code> отвергается, <code>eth_call</code> возвращает <code>0x</code>. У YLX 9 знаков после точки, кошелёк видит 18, поэтому сумма должна быть кратна 10⁹ wei.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 </main>
 
-<footer class="wrap">
-  <div class="foot-grid">
-    <div class="foot-brand">
-      <div class="brandmark" style="gap:12px">
-        <svg class="sigil" viewBox="0 0 40 40" aria-hidden="true">
-          <polyline points="20,3 35,11 35,29 20,37 5,29 5,11 20,3"></polyline>
-          <polyline points="20,10 28,14.5 28,25.5 20,30 12,25.5 12,14.5 20,10"></polyline>
-          <line x1="20" y1="10" x2="20" y2="30"></line>
-        </svg>
-        <span class="name">Phylox</span>
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-top">
+      <div>
+        <a class="brand" href="#main" aria-label="Phylox">
+          <svg viewBox="0 0 32 32" aria-hidden="true"><path class="mark-a" d="M15.2 2.46 3.9 9v14l11.3 6.54z"/><path class="mark-b" d="M16.8 2.46 28.1 9v14l-11.3 6.54z"/></svg>
+          <span>Phylox</span>
+        </a>
+        <p class="foot-id">YLX · CHAIN ID 897688 · <span lang="en">WRITTEN IN GO</span><span lang="ru">НАПИСАНО НА GO</span></p>
       </div>
-      <p data-en="An independent Layer-1 network. Ticker YLX." data-ru="Самостоятельная сеть Layer-1. Тикер YLX.">An independent Layer-1 network. Ticker YLX.</p>
+      <nav class="foot-nav" aria-label="Footer">
+        <a href="#protocol"><span lang="en">Protocol</span><span lang="ru">Протокол</span></a>
+        <a href="#design"><span lang="en">How it works</span><span lang="ru">Устройство</span></a>
+        <a href="#verification"><span lang="en">Verification</span><span lang="ru">Проверка</span></a>
+        <a href="#roadmap"><span lang="en">Roadmap</span><span lang="ru">План</span></a>
+        <a href="#developers"><span lang="en">Developers</span><span lang="ru">Разработчикам</span></a>
+      </nav>
     </div>
-    <div class="colophon">
-      <div>PHYLOX · YLX</div>
-      <div>CHAIN ID · 897688</div>
-      <div>BUILT FROM SCRATCH IN GO</div>
-      <div><span class="egg" id="egg" role="button" tabindex="0" title="?">◆ φύλαξ</span></div>
-    </div>
+    <p class="disclaimer" lang="en">Phylox is under development. No public testnet or mainnet is running, and YLX is not offered or sold. This site is for information only: it is not an offer, a solicitation or financial advice. Figures are protocol parameters and recorded test results, not promises of performance or value.</p>
+    <p class="disclaimer" lang="ru">Phylox находится в разработке. Публичная тестовая и основная сети не запущены, YLX не предлагается и не продаётся. Сайт носит только информационный характер: это не оферта, не предложение и не финансовый совет. Числа — параметры протокола и записанные результаты проверок, а не обещания производительности или стоимости.</p>
+    <p class="foot-meta"><span lang="en">Updated 15 October 2026 · No cookies, no analytics</span><span lang="ru">Обновлено 15 октября 2026 · Без cookies и аналитики</span></p>
   </div>
-  <p class="disclaimer"
-     data-en="This page describes a network under active development. It is informational only — not an offer, solicitation, or financial advice. Figures shown are protocol parameters fixed in code, not performance claims. The network is not yet live."
-     data-ru="Эта страница описывает сеть в активной разработке. Только информация — не оферта, не предложение и не финансовый совет. Приведённые числа — параметры протокола, закреплённые в коде, а не обещания результатов. Сеть ещё не запущена.">
-    This page describes a network under active development. It is informational only — not an offer, solicitation, or financial advice. Figures shown are protocol parameters fixed in code, not performance claims. The network is not yet live.
-  </p>
 </footer>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.13/lenis.min.js"></script>
-<script>
-(function(){
-  "use strict";
-  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  /* ---------- language ---------- */
-  function readLang(){ try{ return localStorage.getItem("phylox-lang"); }catch(e){ return null; } }
-  function saveLang(v){ try{ localStorage.setItem("phylox-lang", v); }catch(e){} }
-  function applyLang(lang){
-    document.documentElement.setAttribute("data-lang", lang);
-    document.documentElement.setAttribute("lang", lang);
-    var nodes = document.querySelectorAll("[data-"+lang+"]");
-    for(var i=0;i<nodes.length;i++){
-      var val = nodes[i].getAttribute("data-"+lang);
-      if(val==null) continue;
-      if(val.indexOf("<")>-1) nodes[i].innerHTML = val; else nodes[i].textContent = val;
-    }
-    var btns = document.querySelectorAll(".lang button");
-    for(var j=0;j<btns.length;j++){
-      btns[j].setAttribute("aria-pressed", btns[j].getAttribute("data-set")===lang ? "true":"false");
-    }
-    buildManifesto(lang);
-    buildHero();
-  }
-  var startLang = readLang() || "en";
-
-  document.querySelectorAll(".lang button").forEach(function(b){
-    b.addEventListener("click", function(){
-      var l = b.getAttribute("data-set"); saveLang(l); applyLang(l);
-    });
-  });
-
-  /* ---------- hero split ---------- */
-  var heroBuilt = "";
-  function buildHero(){
-    var h1 = document.getElementById("hh1");
-    var lang = document.documentElement.getAttribute("data-lang");
-    var word = "Phylox"; // brand name identical in both languages
-    if(heroBuilt===word) return;
-    heroBuilt = word;
-    h1.textContent = "";
-    for(var i=0;i<word.length;i++){
-      var s = document.createElement("span");
-      s.className="ch"; s.textContent = word[i];
-      h1.appendChild(s);
-    }
-    if(!reduce && window.gsap){
-      gsap.fromTo(h1.querySelectorAll(".ch"),
-        {yPercent:118, opacity:0},
-        {yPercent:0, opacity:1, duration:1.1, ease:"expo.out", stagger:0.06, delay:0.15});
-    }
-  }
-
-  /* ---------- manifesto words ---------- */
-  function buildManifesto(lang){
-    var p = document.getElementById("manifesto");
-    var txt = p.getAttribute("data-"+lang) || p.getAttribute("data-en");
-    p.textContent = "";
-    var words = txt.split(" ");
-    var brass = {"lost.":1,"invented.":1,"потеряно,":1,"выдумано.":1};
-    words.forEach(function(w){
-      var span = document.createElement("span");
-      span.className = "w" + (brass[w] ? " br" : "");
-      span.textContent = w + " ";
-      p.appendChild(span);
-    });
-  }
-
-  /* ---------- preloader ---------- */
-  var pre = document.getElementById("pre");
-  var bar = pre.querySelector(".bar b");
-  if(window.gsap && !reduce){
-    gsap.to(bar,{width:"100%",duration:1.1,ease:"power2.inOut"});
-  } else if(bar){ bar.style.width="100%"; }
-  function hidePre(){ pre.classList.add("done"); setTimeout(function(){ pre.style.display="none"; }, 800); }
-  window.addEventListener("load", function(){ setTimeout(hidePre, reduce?100:1150); });
-  setTimeout(hidePre, 2600); // safety
-
-  /* ---------- init language + hero ---------- */
-  applyLang(startLang);
-
-  /* ---------- nav scrolled ---------- */
-  var nav = document.getElementById("nav");
-  var prog = document.getElementById("prog");
-  function onScroll(){
-    var y = window.pageYOffset || document.documentElement.scrollTop;
-    if(y>40) nav.classList.add("scrolled"); else nav.classList.remove("scrolled");
-    var h = document.documentElement.scrollHeight - window.innerHeight;
-    prog.style.width = (h>0 ? (y/h*100):0) + "%";
-  }
-  onScroll();
-
-  /* ---------- lenis smooth scroll ---------- */
-  var lenis = null;
-  if(window.Lenis && !reduce){
-    lenis = new Lenis({ duration:1.1, smoothWheel:true });
-    lenis.on("scroll", function(){ onScroll(); if(window.ScrollTrigger) ScrollTrigger.update(); });
-    function raf(t){ lenis.raf(t); requestAnimationFrame(raf); }
-    requestAnimationFrame(raf);
-    if(window.gsap){ gsap.ticker.add(function(t){ lenis.raf(t*1000); }); gsap.ticker.lagSmoothing(0); }
-  } else {
-    window.addEventListener("scroll", onScroll, {passive:true});
-  }
-  // anchor links via lenis
-  document.querySelectorAll('a[href^="#"]').forEach(function(a){
-    a.addEventListener("click", function(e){
-      var id = a.getAttribute("href");
-      if(id.length<2) return;
-      var el = document.querySelector(id);
-      if(!el) return;
-      e.preventDefault();
-      if(lenis) lenis.scrollTo(el, {offset:-70}); else el.scrollIntoView({behavior:reduce?"auto":"smooth"});
-    });
-  });
-
-  /* ---------- GSAP reveals ---------- */
-  if(window.gsap && window.ScrollTrigger && !reduce){
-    gsap.registerPlugin(ScrollTrigger);
-
-    // section heads + cards rise
-    gsap.utils.toArray(".section-head, .card, .stage, .finale > *").forEach(function(el){
-      gsap.fromTo(el,{y:34,opacity:0},{y:0,opacity:1,duration:.9,ease:"expo.out",
-        scrollTrigger:{trigger:el,start:"top 86%"}});
-    });
-
-    // counters
-    gsap.utils.toArray(".cnt").forEach(function(el){
-      var to = parseFloat(el.getAttribute("data-to"));
-      var obj = {v:0};
-      ScrollTrigger.create({trigger:el,start:"top 90%",once:true,onEnter:function(){
-        gsap.to(obj,{v:to,duration:1.4,ease:"power2.out",onUpdate:function(){
-          el.textContent = to>=1000 ? Math.round(obj.v).toLocaleString("en-US") : Math.round(obj.v);
-        }});
-      }});
-    });
-
-    // manifesto word light-up
-    ScrollTrigger.create({
-      trigger:"#manifesto", start:"top 78%", end:"bottom 60%", scrub:true,
-      onUpdate:function(self){
-        var ws = document.querySelectorAll("#manifesto .w");
-        var lit = Math.floor(self.progress * ws.length * 1.15);
-        ws.forEach(function(w,i){ w.classList.toggle("lit", i<lit); });
-      }
-    });
-
-    // hero ghost parallax
-    gsap.to(".hero-ghost",{yPercent:-18,ease:"none",
-      scrollTrigger:{trigger:".hero",start:"top top",end:"bottom top",scrub:true}});
-
-    // roadmap draw
-    gsap.to("#roadDraw",{height:"100%",ease:"none",
-      scrollTrigger:{trigger:"#road",start:"top 70%",end:"bottom 80%",scrub:true}});
-  } else {
-    // reduced: show final states
-    document.querySelectorAll(".cnt").forEach(function(el){
-      var to = parseFloat(el.getAttribute("data-to"));
-      el.textContent = to>=1000 ? to.toLocaleString("en-US") : to;
-    });
-    document.querySelectorAll("#manifesto .w").forEach(function(w){ w.classList.add("lit"); });
-    var rd=document.getElementById("roadDraw"); if(rd) rd.style.height="100%";
-  }
-
-  /* ---------- chainid reveal ---------- */
-  var cid = document.querySelector(".chainid");
-  if(cid){
-    function toggleCid(){ cid.classList.toggle("open"); }
-    cid.addEventListener("click", toggleCid);
-    cid.addEventListener("mouseenter", function(){ cid.classList.add("open"); });
-    cid.addEventListener("mouseleave", function(){ cid.classList.remove("open"); });
-    cid.addEventListener("keydown", function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggleCid(); }});
-  }
-
-  /* ---------- dust canvas (living background layer) ---------- */
-  (function(){
-    var c = document.getElementById("dust"); if(!c) return;
-    var ctx = c.getContext("2d"), W,H,dots=[], raf, vis=true;
-    function size(){ W=c.width=innerWidth*devicePixelRatio; H=c.height=innerHeight*devicePixelRatio; }
-    size();
-    var N = reduce ? 0 : Math.min(90, Math.floor(innerWidth/16));
-    for(var i=0;i<N;i++){
-      dots.push({x:Math.random()*W,y:Math.random()*H,
-        r:(Math.random()*1.5+0.3)*devicePixelRatio,
-        vx:(Math.random()-.5)*0.12*devicePixelRatio,
-        vy:(-Math.random()*0.18-0.02)*devicePixelRatio,
-        a:Math.random()*0.5+0.1});
-    }
-    function draw(){
-      ctx.clearRect(0,0,W,H);
-      for(var i=0;i<dots.length;i++){
-        var d=dots[i]; d.x+=d.vx; d.y+=d.vy;
-        if(d.y<-10){d.y=H+10;d.x=Math.random()*W;}
-        if(d.x<-10)d.x=W+10; if(d.x>W+10)d.x=-10;
-        var g=ctx.createRadialGradient(d.x,d.y,0,d.x,d.y,d.r*4);
-        g.addColorStop(0,"rgba(188,159,92,"+d.a*0.5+")");
-        g.addColorStop(1,"rgba(188,159,92,0)");
-        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(d.x,d.y,d.r*4,0,6.2832); ctx.fill();
-      }
-      if(vis) raf=requestAnimationFrame(draw);
-    }
-    if(N>0) draw();
-    addEventListener("resize", function(){ size(); });
-    document.addEventListener("visibilitychange", function(){
-      vis=!document.hidden; if(vis&&N>0){ raf=requestAnimationFrame(draw);} else if(raf) cancelAnimationFrame(raf);
-    });
-  })();
-
-  /* ---------- viz: block cadence (card 01) ---------- */
-  (function(){
-    var c=document.getElementById("vizChain"); if(!c||reduce) return;
-    var ctx=c.getContext("2d"),W,H,t0=performance.now(),vis=true,raf;
-    function size(){ var r=c.getBoundingClientRect(); W=c.width=r.width*devicePixelRatio; H=c.height=r.height*devicePixelRatio; }
-    size(); addEventListener("resize",size);
-    function draw(now){
-      ctx.clearRect(0,0,W,H);
-      var period=4000, p=((now-t0)%period)/period;
-      var mid=H*0.62, n=7, gap=W/(n+1), s=Math.min(gap*0.34, H*0.16);
-      for(var i=0;i<n;i++){
-        var x=gap*(i+1), pulse=Math.max(0,1-Math.abs(((p*n)% n)-i))*0.8;
-        ctx.save(); ctx.translate(x,mid);
-        ctx.strokeStyle="rgba(188,159,92,"+(0.18+pulse*0.6)+")";
-        ctx.lineWidth=1*devicePixelRatio;
-        ctx.strokeRect(-s/2,-s/2,s,s);
-        if(i<n-1){ ctx.beginPath(); ctx.moveTo(s/2,0); ctx.lineTo(gap-s/2,0);
-          ctx.strokeStyle="rgba(188,159,92,0.12)"; ctx.stroke(); }
-        ctx.restore();
-      }
-      if(vis) raf=requestAnimationFrame(draw);
-    }
-    raf=requestAnimationFrame(draw);
-    document.addEventListener("visibilitychange",function(){ vis=!document.hidden; if(vis){raf=requestAnimationFrame(draw);}else if(raf)cancelAnimationFrame(raf); });
-  })();
-
-  /* ---------- viz: merkle tree (card 04) ---------- */
-  (function(){
-    var c=document.getElementById("vizTree"); if(!c||reduce) return;
-    var ctx=c.getContext("2d"),W,H,vis=true,raf,t0=performance.now();
-    function size(){ var r=c.getBoundingClientRect(); W=c.width=r.width*devicePixelRatio; H=c.height=r.height*devicePixelRatio; }
-    size(); addEventListener("resize",size);
-    function node(x,y,r,a){ ctx.beginPath(); ctx.arc(x,y,r,0,6.2832); ctx.strokeStyle="rgba(188,159,92,"+a+")"; ctx.lineWidth=1*devicePixelRatio; ctx.stroke(); }
-    function draw(now){
-      ctx.clearRect(0,0,W,H);
-      var topx=W*0.72, topy=H*0.2, dx=W*0.13, dy=H*0.26, r=3.4*devicePixelRatio;
-      var flick=(Math.sin((now-t0)/700)+1)/2;
-      // edges
-      function edge(x1,y1,x2,y2,a){ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.strokeStyle="rgba(188,159,92,"+a+")"; ctx.lineWidth=1*devicePixelRatio; ctx.stroke(); }
-      var l1=[topx-dx,topx+dx];
-      edge(topx,topy,l1[0],topy+dy,0.3); edge(topx,topy,l1[1],topy+dy,0.3);
-      for(var i=0;i<2;i++){
-        var cx=l1[i];
-        edge(cx,topy+dy,cx-dx/2,topy+2*dy,0.22); edge(cx,topy+dy,cx+dx/2,topy+2*dy,0.22);
-      }
-      node(topx,topy,r+1,0.8);
-      node(l1[0],topy+dy,r,0.5); node(l1[1],topy+dy,r,0.5);
-      var leaves=[l1[0]-dx/2,l1[0]+dx/2,l1[1]-dx/2,l1[1]+dx/2];
-      leaves.forEach(function(lx,k){ node(lx,topy+2*dy,r,0.3+ (k===1?flick*0.6:0.1)); });
-      if(vis) raf=requestAnimationFrame(draw);
-    }
-    raf=requestAnimationFrame(draw);
-    document.addEventListener("visibilitychange",function(){ vis=!document.hidden; if(vis){raf=requestAnimationFrame(draw);}else if(raf)cancelAnimationFrame(raf); });
-  })();
-
-  /* ---------- easter egg ---------- */
-  var egg=document.getElementById("egg");
-  if(egg){
-    var lines={
-      en:"φύλαξ · phýlax · a guardian who keeps the watch. Built by hand, block by block.",
-      ru:"φύλαξ · phýlax · страж, что несёт вахту. Собрано вручную, блок за блоком."
-    };
-    function pop(){
-      var lang=document.documentElement.getAttribute("data-lang");
-      egg.textContent = lines[lang]||lines.en;
-      egg.style.color="var(--brass)";
-    }
-    egg.addEventListener("click",pop);
-    egg.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){e.preventDefault();pop();} });
-  }
-
-  /* ---------- console colophon ---------- */
-  try{
-    console.log("%cPHYLOX","color:#BC9F5C;font-size:22px;font-family:Georgia,serif;letter-spacing:2px");
-    console.log("%cφύλαξ — the guardian. Chain ID 897688 = Y·L·X in ASCII. Built from scratch in Go.","color:#9A9080;font-family:monospace");
-  }catch(e){}
-})();
-</script>
 </body>
 </html>
