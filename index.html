@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Phylox — a Layer-1 for transfers with single-block finality</title>
-<meta name="description" content="Phylox is an independent Layer-1 written from scratch in Go: BFT consensus, 4-second blocks, single-block finality, a 0.0001 YLX base fee and half of every fee burned. Pre-launch: running on a test bench, no public network yet.">
+<meta name="description" content="Phylox is an independent Layer-1 written from scratch in Go: BFT consensus, 4-second blocks, single-block finality, a 0.0001 YLX base fee and half of each block's base fees burned. Pre-launch: running on a test bench, no public network yet.">
 <meta name="theme-color" content="#F7F5F0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0F0E0B" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="Phylox">
 <meta property="og:url" content="https://phylox.org/">
 <meta property="og:title" content="Phylox — a Layer-1 for transfers with single-block finality">
-<meta property="og:description" content="Independent Layer-1 written from scratch in Go. BFT consensus, 4-second blocks, 0.0001 YLX base fee, half of every fee burned. Pre-launch.">
+<meta property="og:description" content="Independent Layer-1 written from scratch in Go. BFT consensus, 4-second blocks, 0.0001 YLX base fee, half of each block's base fees burned. Pre-launch.">
 <meta property="og:image" content="https://phylox.org/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -81,8 +81,8 @@
         <span lang="en">A Layer-1 for transfers, final in one block.</span>
         <span lang="ru">Блокчейн для переводов с финальностью в один блок.</span>
       </h1>
-      <p class="lede" lang="en">Phylox is an independent Layer-1 written from scratch in Go. Tendermint-style BFT consensus produces a block every 4 seconds; once two thirds of the validators sign it, the transfer cannot be reversed. The base fee is 0.0001 YLX, and half of every fee is burned.</p>
-      <p class="lede" lang="ru">Phylox — самостоятельный блокчейн первого уровня, написанный с нуля на Go. BFT-консенсус в духе Tendermint выпускает блок раз в 4 секунды; как только блок подписали две трети валидаторов, перевод уже не откатить. Базовая комиссия — 0,0001 YLX, половина каждой комиссии сжигается.</p>
+      <p class="lede" lang="en">Phylox is an independent Layer-1 written from scratch in Go. Tendermint-style BFT consensus produces a block every 4 seconds; once two thirds of the validators sign it, the transfer cannot be reversed. The base fee is 0.0001 YLX, and half of each block's base fees is burned.</p>
+      <p class="lede" lang="ru">Phylox — самостоятельный блокчейн первого уровня, написанный с нуля на Go. BFT-консенсус в духе Tendermint выпускает блок раз в 4 секунды; как только блок подписали две трети валидаторов, перевод уже не откатить. Базовая комиссия — 0,0001 YLX, половина базовых комиссий каждого блока сжигается.</p>
       <div class="cta">
         <a class="btn btn-primary" href="#design"><span lang="en">How it works</span><span lang="ru">Как устроено</span>
           <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h9M8.5 4.5 12 8l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -142,7 +142,7 @@
   <div class="wrap">
     <ul>
       <li><div class="stat-v">4<small lang="en">s</small><small lang="ru">с</small></div><div class="stat-l"><span lang="en">Block interval</span><span lang="ru">Интервал блока</span></div></li>
-      <li><div class="stat-v">1<small lang="en">block</small><small lang="ru">блок</small></div><div class="stat-l"><span lang="en">To finality. No reorgs</span><span lang="ru">До финальности. Без откатов</span></div></li>
+      <li><div class="stat-v">1<small lang="en">block</small><small lang="ru">блок</small></div><div class="stat-l"><span lang="en">To finality. No reorgs while &lt;1/3 faulty</span><span lang="ru">До финальности. Без откатов при &lt; 1/3 сбойных</span></div></li>
       <li><div class="stat-v"><span lang="en">0.0001</span><span lang="ru">0,0001</span><small>YLX</small></div><div class="stat-l"><span lang="en">Fee for a basic transfer</span><span lang="ru">Комиссия простого перевода</span></div></li>
       <li><div class="stat-v">~455<small lang="en">tx/s</small><small lang="ru">пер./с</small></div><div class="stat-l"><span lang="en">Capacity at 256 KiB per block</span><span lang="ru">Пропускная способность при блоке 256 КиБ</span></div></li>
     </ul>
@@ -173,7 +173,7 @@
         </tr>
         <tr>
           <th scope="row"><span lang="en">Finality</span><span lang="ru">Финальность</span></th>
-          <td class="v"><span lang="en">Single block. A block signed by ⌈2n/3⌉ validators is never rolled back</span><span lang="ru">Один блок. Блок с подписями ⌈2n/3⌉ валидаторов не откатывается никогда</span></td>
+          <td class="v"><span lang="en">Single block. A block signed by ⌈2n/3⌉ validators is never rolled back while fewer than a third of validators are faulty</span><span lang="ru">Один блок. Блок с подписями ⌈2n/3⌉ валидаторов не откатывается, пока сбойных валидаторов меньше трети</span></td>
           <td class="c"><code>ConsensusThresholdNum/Den = 2/3</code></td>
         </tr>
         <tr>
@@ -314,12 +314,12 @@
         <p lang="ru">Каждый узел вычисляет награду из высоты блока целочисленно, с округлением вниз. Валидатор не может вписать себе награду в блок.</p>
         <ul lang="en">
           <li>10% to the proposer, 90% to the signers of the parent commit</li>
-          <li>Half of every fee is burned, so net issuance shrinks as usage grows</li>
+          <li>Half of each block's base fees is burned, so net issuance shrinks as usage grows</li>
           <li>The new-account surcharge is burned in full</li>
         </ul>
         <ul lang="ru">
           <li>10% сборщику, 90% подписавшим коммит родителя</li>
-          <li>Половина каждой комиссии сгорает: чем больше переводов, тем меньше чистый прирост предложения</li>
+          <li>Половина базовых комиссий каждого блока сгорает: чем больше переводов, тем меньше чистый прирост предложения</li>
           <li>Доплата за новый адрес сгорает целиком</li>
         </ul>
         <p class="ref"><span>SPEC §7 · ADR-0007</span></p>
@@ -404,7 +404,7 @@
         </div>
         <h3><span lang="en">Four validators and an observer ran for a full day under load, with a validator killed every hour. The monitor recorded no failures.</span><span lang="ru">Четыре валидатора и наблюдатель проработали сутки под нагрузкой, раз в час один валидатор принудительно останавливался. Монитор не записал ни одного сбоя.</span></h3>
         <div class="metrics">
-          <div><b><span lang="en">24 h 00 m</span><span lang="ru">24 ч 00 мин</span></b><span lang="en">continuous run, no intervention</span><span lang="ru">без вмешательства</span></div>
+          <div><b><span lang="en">24 h 00 m</span><span lang="ru">24 ч 00 мин</span></b><span lang="en">continuous run, no intervention</span><span lang="ru">непрерывно, без вмешательства</span></div>
           <div><b><span lang="en">21,349</span><span lang="ru">21&nbsp;349</span></b><span lang="en">blocks, same height on all 5 nodes</span><span lang="ru">блоков, одна высота у всех 5 узлов</span></div>
           <div><b>0</b><span lang="en">failures by the monitor’s rules</span><span lang="ru">сбоев по правилам монитора</span></div>
           <div><b>23</b><span lang="en">forced validator kills, one an hour</span><span lang="ru">принудительные остановки валидаторов, раз в час</span></div>
@@ -454,7 +454,7 @@
           <tr><td><span lang="en">8–9 Oct</span><span lang="ru">8–9 окт.</span></td><td><span class="badge badge-pass"><span lang="en">Passed</span><span lang="ru">Пройден</span></span></td>
             <td><span lang="en">Rerun on a quiet host. Height 21,336. Built with Go 1.27.0.</span><span lang="ru">Повтор на ненагруженном ПК. Высота 21&nbsp;336. Сборка на Go 1.27.0.</span></td></tr>
           <tr><td><span lang="en">10–13 Oct</span><span lang="ru">10–13 окт.</span></td><td><span class="badge badge-skip"><span lang="en">Not passed</span><span lang="ru">Не засчитаны</span></span></td>
-            <td><span lang="en">Attempts after moving to Go 1.27.2 failed or were cut short. Causes found: host pauses of up to 190 seconds (the monitor now measures and subtracts them) and a metrics bug that briefly showed a restarted validator as outside the set (fixed, with a test). Two attempts were stopped externally with no protocol failures.</span><span lang="ru">Попытки после перехода на Go 1.27.2 падали или прерывались. Найденные причины: паузы ПК до 190 секунд (монитор теперь их измеряет и вычитает) и ошибка метрик, из-за которой перезапущенный валидатор на мгновение выглядел вне состава (исправлено, с тестом). Две попытки остановлены извне, сбоев протокола в них не было.</span></td></tr>
+            <td><span lang="en">Attempts after moving to Go 1.27.2 failed or were cut short. Causes found: host pauses of up to 190 seconds (the monitor now measures and subtracts them) and a metrics bug that briefly showed a restarted validator as outside the set (fixed in the code with a test, but after the passed run was built: that run used a build without this fix). Two attempts were stopped externally with no protocol failures.</span><span lang="ru">Попытки после перехода на Go 1.27.2 падали или прерывались. Найденные причины: паузы ПК до 190 секунд (монитор теперь их измеряет и вычитает) и ошибка метрик, из-за которой перезапущенный валидатор на мгновение выглядел вне состава (исправлено в коде с тестом, но уже после сборки зачтённого прогона: он шёл на сборке без этого исправления). Две попытки остановлены извне, сбоев протокола в них не было.</span></td></tr>
           <tr><td><span lang="en">13–14 Oct</span><span lang="ru">13–14 окт.</span></td><td><span class="badge badge-pass"><span lang="en">Passed</span><span lang="ru">Пройден</span></span></td>
             <td><span lang="en">Go 1.27.2. Height 21,349, zero host pauses. The full check suite and the release build passed afterwards.</span><span lang="ru">Go 1.27.2. Высота 21&nbsp;349, пауз хоста 0. После прогона полная проверка и сборка релиза прошли.</span></td></tr>
         </tbody>
@@ -483,10 +483,10 @@
         <h4><span lang="en">Signature-check headroom</span><span lang="ru">Запас по проверке подписей</span></h4>
         <p lang="en">A full block of signatures verifies in 248 ms against a 4-second interval. The check suite fails if headroom drops below 2×.</p>
         <p lang="ru">Полный блок подписей проверяется за 248 мс при интервале 4 секунды. Проверка падает, если запас опустится ниже двукратного.</p></div>
-      <div><b>32 / 32</b>
+      <div><b>35 / 35</b>
         <h4><span lang="en">Ethereum tooling checks</span><span lang="ru">Проверок с инструментами Ethereum</span></h4>
-        <p lang="en">eth-account (Python) and ethers v6 against a live node. MetaMask 13.50.0 added the network and sent two transfers that were included in blocks.</p>
-        <p lang="ru">eth-account (Python) и ethers v6 против живого узла. MetaMask 13.50.0 добавил сеть и отправил два перевода, оба вошли в блоки.</p></div>
+        <p lang="en">eth-account (Python): 35 of 35 checks against a live node after review; ethers v6 checked by a separate script. MetaMask 13.50.0 added the network and sent two transfers that were included in blocks.</p>
+        <p lang="ru">eth-account (Python): 35 проверок из 35 против живого узла после ревью; ethers v6 проверен отдельным сценарием. MetaMask 13.50.0 добавил сеть и отправил два перевода, оба вошли в блоки.</p></div>
     </div>
 
     <h3 class="sub-h reveal"><span lang="en">Not verified yet</span><span lang="ru">Ещё не проверено</span></h3>
